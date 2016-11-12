@@ -8,6 +8,7 @@ bin/*.map
 bin/*.dll
 bin/*.exe
 source/*.o
+build/*.o
 =======
 # Compiled Object files
 *.slo
