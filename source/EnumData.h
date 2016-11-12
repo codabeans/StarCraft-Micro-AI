@@ -82,9 +82,9 @@ public:
         setType("Players");
         names.resize(Size);
         setData(Player_One,     "Player One");
-		setData(Player_Two,     "Player Two");
-		setData(Player_None,    "Player None");
-		setData(Player_Both,    "Player Both");
+        setData(Player_Two,     "Player Two");
+        setData(Player_None,    "Player None");
+        setData(Player_Both,    "Player Both");
     }
 };
 
@@ -105,24 +105,25 @@ public:
 class PlayerModels : public EnumData<PlayerModels>
 {
 public:
-    enum { AlphaBeta, AttackClosest, Kiter, Random, AttackWeakest, AttackDPS, KiterDPS, NOKDPS, Kiter_NOKDPS, Cluster, PortfolioGreedySearch, UCT, None, Size };
+    enum { AlphaBeta, AttackClosest, Kiter, Random, AttackWeakest, AttackDPS, DeepQ, KiterDPS, NOKDPS, Kiter_NOKDPS, Cluster, PortfolioGreedySearch, UCT, None, Size };
     static void init()
     {
         setType("PlayerModels");
         names.resize(Size);
         setData(AlphaBeta,              "AlphaBeta");
-		setData(AttackClosest,          "AttackClosest");
-		setData(Kiter,                  "Kiter");
-		setData(Random,                 "Random");
-		setData(AttackWeakest,          "AttackWeakest");
-		setData(AttackDPS,              "AttackDPS");
-		setData(KiterDPS,               "KiterDPS");
-		setData(NOKDPS,                 "NOKDPS");
+        setData(AttackClosest,          "AttackClosest");
+        setData(Kiter,                  "Kiter");
+        setData(Random,                 "Random");
+        setData(AttackWeakest,          "AttackWeakest");
+        setData(AttackDPS,              "AttackDPS");
+        setData(DeepQ,                  "DeepQ");
+        setData(KiterDPS,               "KiterDPS");
+        setData(NOKDPS,                 "NOKDPS");
         setData(Kiter_NOKDPS,           "Kiter_NOKDPS");
         setData(Cluster,                "Cluster");
         setData(PortfolioGreedySearch,  "PortfolioGreedySearch");
         setData(UCT,                    "UCT");
-		setData(None,                   "None");
+        setData(None,                   "None");
     }
 };
 

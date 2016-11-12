@@ -13,6 +13,7 @@
 #include "Player_AttackClosest.h"
 #include "Player_AttackDPS.h"
 #include "Player_AttackWeakest.h"
+#include "Player_DeepQ.h"
 #include "Player_Kiter.h"
 #include "Player_KiterDPS.h"
 #include "Player_NOKDPS.h"
