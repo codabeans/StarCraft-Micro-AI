@@ -2,7 +2,9 @@ Compilation Instructions:
 
 1. Install the required libraries
 
-'sudo apt install libsdl2-dev libsdl2-image-dev'
+'''
+sudo apt install libsdl2-dev libsdl2-image-dev
+'''
 
 2. Clone the BWAPI github repository somewhere on your system
 
