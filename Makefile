@@ -11,7 +11,7 @@ CAFFE=/home/faust/Documents/caffe
 BUILD		:=	build
 SOURCES		:=	source source/main source/gui
 BWAPI_SOURCES	:= 	$(BWAPI)/BWAPILIB $(BWAPI)/BWAPILIB/Source
-INCLUDES	:=	include $(BWAPI)/include $(BWAPI)/include/BWAPI $(CAFFE_DIR)/include
+INCLUDES	:=	$(BWAPI)/include $(BWAPI)/include/BWAPI $(CAFFE_DIR)/include
 
 TARGET		:=	$(CURDIR)/bin/$(notdir $(CURDIR))
 
@@ -21,7 +21,7 @@ FIND_CPP_FILES 	= 	$(notdir $(wildcard $(dir)/*.cpp))
 # automatically build a list of object files for our project
 #---------------------------------------------------------------------------------
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(FIND_CPP_FILES))
-BWAPICPPFILES	:=	$(foreach dir,$(BWAPI_SOURCES),$(FIND_CPP_FILES)))
+BWAPICPPFILES	:=	$(wildcard $(BWAPI_DIR)/BWAPILIB/Source/*.cpp) $(wildcard $(BWAPI_DIR)/BWAPILIB/*.cpp)
 
 export OFILES		:=	$(addprefix $(BUILD)/,$(CPPFILES:.cpp=.o))
 export BWAPIOFILES	:=	$(addprefix $(BWAPI)/$(BUILD)/,$(BWAPICPPFILES:.cpp=.o))
@@ -30,22 +30,21 @@ export BWAPIOFILES	:=	$(addprefix $(BWAPI)/$(BUILD)/,$(BWAPICPPFILES:.cpp=.o))
 # use CXX for linking C++ projects, CC for standard C
 #---------------------------------------------------------------------------------
 
-LD		 = 	$(CXX)
+LD		 = 	g++
 
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------
 
-export INCLUDE	:=	$(foreach dir,$(INCLUDES), \
-					-I$(CURDIR)/$(dir)) \
-					-I$(CURDIR)/$(BUILD)	
+export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(dir))
+	
 # Flags
 SDL_CFLAGS=`sdl2-config --cflags` 
 
 CPPFLAGS=-Wall -g -W -w -pedantic -ansi -lutil -std=c++11 $(SDL_CFLAGS)
 
 # Linking flags
-INCLUDEPATH +=-I$(BWAPI)/include -I$(BWAPI)/include/BWAPI -I$(BWAPI) -I$(CAFFE)/include -I /usr/local/cuda/include
+INCLUDEPATH += -I /usr/local/cuda/include
 
 SDL_LDFLAGS=`sdl2-config --libs` 
 
@@ -89,7 +88,8 @@ $(BWAPI)/$(BUILD)/%.o:$(BWAPI)/BWAPILIB/Source/%.cpp
 
 sparcraft:$(OFILES)
 	@echo linking ...
-	@$(CC) $(OBJECTS) -o bin/$@  $(LDFLAGS)
+	@echo $(INCLUDEPATH)
+	@$(LD) $(OFILES) $(BWAPIOFILES) -o bin/$@  $(INCLUDEPATH) $(LDFLAGS) $(INCLUDES)
 
 bwapi: $(BWAPIOFILES)
 
@@ -113,3 +113,4 @@ install:
 uninstall:
 	@sudo rm -rf /opt/$(TARGET)
 	@sudo rm -f /usr/local/bin/$(TARGET)
+

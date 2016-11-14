@@ -5,7 +5,7 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
-//#include <caffe/caffe.hpp>
+#include <caffe/caffe.hpp>
 
 //Caffe::set_Mode(Caffe::GPU);
 
