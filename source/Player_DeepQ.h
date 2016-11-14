@@ -4,6 +4,11 @@
 #include "Player.h"
 #include <opencv2/core/core.hpp>
 #include <vector>
+#include <memory>
+#include <algorithm>
+#include <iosfwd>
+#include <string>
+#include <utility>
 
 #include <caffe/caffe.hpp>
 
@@ -12,8 +17,8 @@
 namespace SparCraft
 {
 
-struct MapState
-{
+  struct MapState
+  {
     int _dimX;
     int _dimY;
 
@@ -26,34 +31,35 @@ struct MapState
     std::vector<Position> _enemyPos;
     std::vector<int> _enemyHpRemaining;
     std::vector<int> _enemyEnergy;
-};
+  };
 
-/*----------------------------------------------------------------------
- | Deep Q learning
- |----------------------------------------------------------------------
- | 1) Feed the game state into a Convolutional neural network:
- | 2) Do a forward pass of the CNN
- | 3) Execute the moves the CNN outputs
- | 4) Observe the game
- | 5) Backprop based on observation
- `----------------------------------------------------------------------*/
-class Player_DeepQ : public Player
-{
-public:
+  /*----------------------------------------------------------------------
+  | Deep Q learning
+  |----------------------------------------------------------------------
+  | 1) Feed the game state into a Convolutional neural network:
+  | 2) Do a forward pass of the CNN
+  | 3) Execute the moves the CNN outputs
+  | 4) Observe the game
+  | 5) Backprop based on observation
+  `----------------------------------------------------------------------*/
+  class Player_DeepQ : public Player
+  {
+  public:
     Player_DeepQ (const IDType & playerID);
     IDType getType() { return PlayerModels::DeepQ; }
 
     void observeState(GameState state);
+    void initializeNet(std::string model_file);
     void prepareModelInput();
     void forward();
     void getMoves();
     void computeLoss(GameState state);
     void backward();
 
-private:
+  private:
     MapState _currState;
     cv::Mat _Img;
     float _loss;
-    //Net<float> caffe_train_net('/home/innovation/Documents/caffe/models/bvlc_alexnet/train_val.prototxt');
-};
+    std::shared_ptr<caffe::Net<float> > _net;
+  };
 }

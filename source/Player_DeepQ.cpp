@@ -1,7 +1,11 @@
 #include "Player_DeepQ.h"
+#include <string>
 
 using namespace SparCraft;
 using namespace cv;
+using namespace caffe;
+
+std::string model = "/home/faust/Documents/starcraft-ai/sparcraft/models/train_val.prototxt";
 
 Player_DeepQ::Player_DeepQ (const IDType & playerID)
 {
@@ -39,6 +43,11 @@ void Player_DeepQ::observeState(GameState state)
 
 }
 
+void Player_DeepQ::initializeNet(string model_file)
+{
+//  _net =  Net<float>(model_file, caffe::TRAIN);
+}
+
 void Player_DeepQ::prepareModelInput()
 {
     _Img = Mat::zeros(_currState._dimX, _currState._dimY, CV_8UC(3));
@@ -57,7 +66,7 @@ void Player_DeepQ::prepareModelInput()
 
 void Player_DeepQ::forward()
 {
-    5+5;
+
 }
 
 void Player_DeepQ::getMoves()
