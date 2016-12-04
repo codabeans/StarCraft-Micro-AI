@@ -12,8 +12,6 @@
 
 #include <caffe/caffe.hpp>
 
-//Caffe::set_Mode(Caffe::GPU);
-
 namespace SparCraft
 {
 
@@ -49,8 +47,12 @@ namespace SparCraft
     IDType getType() { return PlayerModels::DeepQ; }
 
     void observeState(GameState state);
-    void initializeNet(std::string model_file);
+    int getControllableUnits(GameState state);
+    void makeNet(GameState state);
+    void initializeNet();
     void prepareModelInput();
+    void wrapInputLayer(std::vector<cv::Mat>* input_channels);
+    void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
     void forward();
     void getMoves();
     void computeLoss(GameState state);
@@ -58,8 +60,9 @@ namespace SparCraft
 
   private:
     MapState _currState;
-    cv::Mat _Img;
+    cv::Mat _img;
     float _loss;
     std::shared_ptr<caffe::Net<float> > _net;
+    std::string _modelFile;
   };
 }

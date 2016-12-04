@@ -1,9 +1,8 @@
-name: "AlexNet"
 layer {
   name: "data"
   type: "Input"
   top: "data"
-  input_param { shape: { dim: 10 dim: 3 dim: 227 dim: 227 } }
+  input_param { shape: { dim: X dim: X dim: X dim: X } }
 }
 layer {
   name: "conv1"
