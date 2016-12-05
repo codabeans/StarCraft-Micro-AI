@@ -98,11 +98,8 @@ Player 1 DeepQ
 #State StateDescriptionFile 10 PATH_TO\sample_state.txt
 
 # Sample SeparatedState States
-State SeparatedState 100 128 128 400 360 840 360 Protoss_Dragoon 50
-State SeparatedState 100 128 128 400 360 840 360 Zerg_Zergling 50
-State SeparatedState 100 128 128 400 360 840 360 Protoss_Dragoon 25 Protoss_Zealot 25
-State SeparatedState 100 128 128 400 360 840 360 Protoss_Dragoon 25 Terran_Marine 25
-State SeparatedState 100 128 128 400 360 840 360 Terran_Marine 25 Zerg_Zergling 25
+State SeparatedState 100 128 128 400 360 840 360 Protoss_Dragoon 10
+State SeparatedState 100 128 128 400 360 840 360 Zerg_Zergling 10
 
 # Sample Symmetric State States
 #State StateSymmetric 10 128 128 Protoss_Dragoon 8
@@ -122,7 +119,7 @@ State SeparatedState 100 128 128 400 360 840 360 Terran_Marine 25 Zerg_Zergling 
 #
 ##################################################
 
-ResultsFile PATH_TO\sample_exp true
+ResultsFile sample_exp true
 
 ##################################################
 #

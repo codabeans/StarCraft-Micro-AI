@@ -51,20 +51,24 @@ namespace SparCraft
     int getControllableUnits(GameState state);
     void makeNet(GameState state);
     void initializeNet();
-    void prepareModelInput();
+    void prepareModelInput(std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
     void forward();
-    std::vector<float> getNetOutput(GameState state);
+    void getNetOutput();
     void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
-    void computeLoss(GameState state);
-    void backward();
+    void selectRandomMoves(const MoveArray & moves, std::vector<Action> & moveVec);
+    void selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec);
+    void getReward(GameState state);
+    void backward(GameState state);
 
-  private:
+private:
     bool _init;
+    int _frameNumber;
     MapState _currState;
     cv::Mat _img;
-    float _loss;
+    float _reward;
+    float _futureReward;
     std::shared_ptr<caffe::Net<float> > _net;
     std::string _modelFile;
   };
