@@ -1,8 +1,7 @@
 #include "Player_DeepQ.h"
-#include <string>
 #include <fstream>
 #include <iostream>
-#include <caffe/caffe.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace SparCraft;
 using namespace cv;
@@ -12,17 +11,33 @@ using namespace std;
 Player_DeepQ::Player_DeepQ (const IDType & playerID)
 {
     _playerID = playerID;
+    _init = false;
 }
 
+void Player_DeepQ::init(GameState state)
+{
+    getMapDims(state);
+    makeNet(state);
+    initializeNet();
+    observeState(state);
+    _init = true;
+}
+
+void Player_DeepQ::getMapDims(GameState state)
+{
+    //Pixel dimensions when no map is specifies
+    _currState._dimX = 1280;
+    _currState._dimY = 704;
+
+    //TODO: dynamically pull the arena size
+    //_currState._dimX = state.getMap()->getWalkTileWidth();
+    //_currState._dimY = state.getMap()->getWalkTileHeight();
+}
 void Player_DeepQ::observeState(GameState state)
 {
-    _currState._dimX = state.getMap()->getPixelWidth();
-    _currState._dimY = state.getMap()->getPixelHeight();
-
     //get the id, location and health of every allied unit on the map
 
     IDType friendly(_playerID);
-
     for (IDType u(0); u<state.numUnits(friendly); ++u)
     {
         _currState._friendlyID.push_back(u);
@@ -34,7 +49,6 @@ void Player_DeepQ::observeState(GameState state)
     //get the  id, location and health of every enemy unit on the map
 
     IDType enemy(state.getEnemy(_playerID));
-
     for (IDType u(0); u<state.numUnits(enemy); ++u)
     {
         _currState._enemyID.push_back(u);
@@ -50,29 +64,29 @@ void Player_DeepQ::observeState(GameState state)
 void Player_DeepQ::makeNet(GameState state)
 {
     int units = getControllableUnits(state);
-    string fileName = "models/" + to_string(units) + ".prototxt";
+    string fileName = "../models/" + to_string(units) + ".prototxt";
     _modelFile = fileName;
-    ifstream checkIfFileExists(fileName);
-    if(!checkIfFileExists)
-    {
-        return;
-    }
 
     ofstream modelFile(fileName);
-    ifstream modelArchitectureFile("models/example.prototxt");
+    ifstream modelArchitectureFile("../models/example.prototxt");
 
-    string strReplace21 = "  input_param { shape: { dim: X dim: X dim: X dim: X } }";
+    string strReplace1 = "  input_param { shape: { dim: X dim: X dim: X dim: X } }";
     string strNew1 = "  input_param { shape: { dim: 1 dim: 3 dim: " + to_string(_currState._dimX) +" dim: " + to_string(_currState._dimY) + " } }";
     string strReplace2 = "    num_output: x";
-    string strNew2 = "    num_output: " + to_string(units);
-    if(!modelFile || !modelArchitectureFile)
+    string strNew2 = "    num_output: " + to_string(units*3);
+
+    if(!modelFile.is_open() || !modelArchitectureFile.is_open())
     {
         cout << "Error opening file(s)!" << endl;
         return;
     }
     string strTemp;
-    while(modelArchitectureFile >> strTemp)
+    while(std::getline(modelArchitectureFile, strTemp))
     {
+        if(strTemp == strReplace1)
+        {
+            strTemp = strNew1;
+        }
         if(strTemp == strReplace2)
         {
             strTemp = strNew2;
@@ -101,17 +115,17 @@ void Player_DeepQ::initializeNet()
 
 void Player_DeepQ::prepareModelInput()
 {
-    _img = Mat::zeros(_currState._dimX, _currState._dimY, CV_8UC(3));
+    _img = Mat::zeros(_currState._dimY, _currState._dimX, CV_8UC(3));
     for(uint i = 0; i < _currState._friendlyID.size(); i++)
     {
-        Vec3b color(_currState._friendlyID.at(i), _currState._friendlyHpRemaining.at(i), _currState._friendlyEnergy.at(i));
-        _img.at<Vec3b>(Point(_currState._friendlyPos.at(i).x(), _currState._friendlyPos.at(i).y())) = color;
+        Vec4b color(_currState._friendlyID.at(i), _currState._friendlyHpRemaining.at(i), _currState._friendlyEnergy.at(i), 100);
+        _img.at<Vec4b>(Point(_currState._friendlyPos.at(i).x() - 200, _currState._friendlyPos.at(i).y() - 200)) = color;
     }
 
     for(uint i = 0; i < _currState._enemyID.size(); i++)
     {
-        Vec3b color(_currState._enemyID.at(i), _currState._enemyHpRemaining.at(i), _currState._enemyEnergy.at(i));
-        _img.at<Vec3b>(Point(_currState._enemyPos.at(i).x(), _currState._enemyPos.at(i).y())) = color;
+        Vec4b color(_currState._enemyID.at(i), _currState._enemyHpRemaining.at(i), _currState._enemyEnergy.at(i), 200);
+        _img.at<Vec4b>(Point(_currState._enemyPos.at(i).x() - 200, _currState._enemyPos.at(i).y() - 200)) = color;
     }
 }
 
@@ -152,8 +166,35 @@ void Player_DeepQ::forward()
     _net->Forward();
 }
 
-void Player_DeepQ::getMoves()
+vector<float> Player_DeepQ::getNetOutput(GameState state)
 {
+    Blob<float>* output_layer = _net->output_blobs()[0];
+    vector<float> output;
+    int outputNeurons = getControllableUnits(state)*3;
+    for(int i = 0; i < outputNeurons; i++)
+    {
+        float value = output_layer->cpu_data()[i];
+        output.push_back(value);
+    }
+    return output;
+}
+
+void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec)
+{
+    if(!_init)
+    {
+        init(state);
+    }
+    observeState(state);
+    prepareModelInput();
+
+    forward();
+    vector<float> output = getNetOutput(state);
+    cout << output.size() << endl;
+    for(int i = 0; i < output.size(); i++)
+    {
+        cout << output[i] << endl;
+    }
 
 }
 

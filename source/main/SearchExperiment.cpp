@@ -96,7 +96,7 @@ void SearchExperiment::padString(std::string & str, const size_t & length)
 std::string SearchExperiment::getResultsSummaryFileName()
 {
     std::string res = resultsFile;
-    
+
     if (appendTimeStamp)
     {
         res += "_" + getDateTimeString();
@@ -109,7 +109,7 @@ std::string SearchExperiment::getResultsSummaryFileName()
 std::string SearchExperiment::getResultsOutFileName()
 {
     std::string res = resultsFile;
-    
+
     if (appendTimeStamp)
     {
         res += "_" + getDateTimeString();
@@ -122,7 +122,7 @@ std::string SearchExperiment::getResultsOutFileName()
 std::string SearchExperiment::getConfigOutFileName()
 {
     std::string conf = resultsFile;
-    
+
     if (appendTimeStamp)
     {
         conf += "_" + getDateTimeString();
@@ -137,12 +137,12 @@ std::string SearchExperiment::getDateTimeString()
     return timeString;
 }
 
-void SearchExperiment::setCurrentDateTime() 
+void SearchExperiment::setCurrentDateTime()
 {
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];
-    
+
     std::fill(buf, buf+80, '0');
     tstruct = *localtime(&now);
     strftime(buf, sizeof(buf), "%Y-%m-%d_%X", &tstruct);
@@ -178,7 +178,7 @@ std::vector<std::string> SearchExperiment::getLines(const std::string & filename
     {
         // get the line and set up the string stream
         getline(fin, line);
-       
+
         // skip blank lines and comments
         if (line.length() > 1 && line[0] != '#')
         {
@@ -287,13 +287,13 @@ void SearchExperiment::addState(const std::string & line)
     std::string state;
     std::string stateType;
     int numStates;
-    
+
     iss >> state;
     iss >> stateType;
     iss >> numStates;
 
     if (strcmp(stateType.c_str(), "StateSymmetric") == 0)
-    { 
+    {
         int xLimit, yLimit;
         iss >> xLimit;
         iss >> yLimit;
@@ -331,7 +331,7 @@ void SearchExperiment::addState(const std::string & line)
     {
         std::string filename;
         iss >> filename;
-        
+
         for (int i(0); i<numStates; ++i)
         {
             parseStateDescriptionFile(filename);
@@ -370,13 +370,13 @@ void SearchExperiment::addState(const std::string & line)
     else
     {
         System::FatalError("Invalid State Type in Configuration File: " + stateType);
-    }  
+    }
 }
 
 void SearchExperiment::parseStateDescriptionFile(const std::string & fileName)
 {
     std::vector<std::string> lines = getLines(fileName);
-    
+
     GameState currentState;
 
     for (size_t u(0); u<lines.size(); ++u)
@@ -439,7 +439,7 @@ void SearchExperiment::addPlayer(const std::string & line)
     int playerID;
     int playerModelID;
     std::string playerModelString;
-    
+
     iss >> player;
     iss >> playerID;
     iss >> playerModelString;
@@ -450,44 +450,48 @@ void SearchExperiment::addPlayer(const std::string & line)
 
     //std::cout << "Player " << playerID << " adding type " << playerModelString << " (" << playerModelID << ")" << std::endl;
 
-   	if (playerModelID == PlayerModels::AttackClosest)		
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_AttackClosest(playerID))); 
+   	if (playerModelID == PlayerModels::AttackClosest)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_AttackClosest(playerID)));
     }
 	else if (playerModelID == PlayerModels::AttackDPS)
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_AttackDPS(playerID))); 
+    {
+        players[playerID].push_back(PlayerPtr(new Player_AttackDPS(playerID)));
     }
-	else if (playerModelID == PlayerModels::AttackWeakest)		
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_AttackWeakest(playerID))); 
+	else if (playerModelID == PlayerModels::AttackWeakest)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_AttackWeakest(playerID)));
     }
-	else if (playerModelID == PlayerModels::Kiter)				
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_Kiter(playerID))); 
+    else if (playerModelID == PlayerModels::DeepQ)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_DeepQ(playerID)));
     }
-	else if (playerModelID == PlayerModels::KiterDPS)			
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_KiterDPS(playerID))); 
+	else if (playerModelID == PlayerModels::Kiter)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_Kiter(playerID)));
     }
-    else if (playerModelID == PlayerModels::Kiter_NOKDPS)			
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_Kiter_NOKDPS(playerID))); 
+	else if (playerModelID == PlayerModels::KiterDPS)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_KiterDPS(playerID)));
     }
-    else if (playerModelID == PlayerModels::Cluster)			
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_Cluster(playerID))); 
+    else if (playerModelID == PlayerModels::Kiter_NOKDPS)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_Kiter_NOKDPS(playerID)));
     }
-	else if (playerModelID == PlayerModels::NOKDPS)	
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_NOKDPS(playerID))); 
+    else if (playerModelID == PlayerModels::Cluster)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_Cluster(playerID)));
     }
-	else if (playerModelID == PlayerModels::Random)				
-    { 
-        players[playerID].push_back(PlayerPtr(new Player_Random(playerID))); 
+	else if (playerModelID == PlayerModels::NOKDPS)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_NOKDPS(playerID)));
     }
-    else if (playerModelID == PlayerModels::PortfolioGreedySearch)				
-    { 
+	else if (playerModelID == PlayerModels::Random)
+    {
+        players[playerID].push_back(PlayerPtr(new Player_Random(playerID)));
+    }
+    else if (playerModelID == PlayerModels::PortfolioGreedySearch)
+    {
         std::string enemyPlayerModel;
         size_t timeLimit(0);
         int iterations(1);
@@ -498,7 +502,7 @@ void SearchExperiment::addPlayer(const std::string & line)
         iss >> iterations;
         iss >> responses;
 
-        players[playerID].push_back(PlayerPtr(new Player_PortfolioGreedySearch(playerID, PlayerModels::getID(enemyPlayerModel), iterations, responses, timeLimit))); 
+        players[playerID].push_back(PlayerPtr(new Player_PortfolioGreedySearch(playerID, PlayerModels::getID(enemyPlayerModel), iterations, responses, timeLimit)));
     }
     else if (playerModelID == PlayerModels::AlphaBeta)
     {
@@ -544,7 +548,7 @@ void SearchExperiment::addPlayer(const std::string & line)
         params.setEvalMethod(evalMethodID);
         params.setSimScripts(playoutScriptID1, playoutScriptID2);
         params.setPlayerToMoveMethod(playerToMoveID);
-	
+
         // add scripts for move ordering
         if (moveOrderingID == MoveOrderMethod::ScriptFirst)
         {
@@ -570,7 +574,7 @@ void SearchExperiment::addPlayer(const std::string & line)
         }
 
         PlayerPtr abPlayer(new Player_AlphaBeta(playerID, params, TTPtr((TranspositionTable *)NULL)));
-        players[playerID].push_back(abPlayer); 
+        players[playerID].push_back(abPlayer);
     }
     else if (playerModelID == PlayerModels::UCT)
     {
@@ -627,7 +631,7 @@ void SearchExperiment::addPlayer(const std::string & line)
             params.addOrderedMoveScript(PlayerModels::KiterDPS);
             //params.addOrderedMoveScript(PlayerModels::Cluster);
         }
-	
+
         // set opponent modeling if it's not none
         if (opponentModelID != PlayerModels::None)
         {
@@ -644,7 +648,7 @@ void SearchExperiment::addPlayer(const std::string & line)
         }
 
         PlayerPtr uctPlayer(new Player_UCT(playerID, params));
-        players[playerID].push_back(uctPlayer); 
+        players[playerID].push_back(uctPlayer);
     }
 	else
     {
@@ -679,7 +683,7 @@ GameState SearchExperiment::getSymmetricState( std::vector<std::string> & unitTy
             {
                 type = t;
                 break;
-            } 
+            }
         }
 
         // add the symmetric unit for each count in the numUnits Vector
@@ -693,14 +697,14 @@ GameState SearchExperiment::getSymmetricState( std::vector<std::string> & unitTy
             state.addUnit(type, Players::Player_Two, u2);
 	    }
     }
-    
+
     //std::cout << std::endl;
 	state.finishedMoving();
 	return state;
 }
 
 void SearchExperiment::addSeparatedState(  std::vector<std::string> & unitTypes, std::vector<int> & numUnits,
-                                                const PositionType cx1, const PositionType cy1, 
+                                                const PositionType cx1, const PositionType cy1,
                                                 const PositionType cx2, const PositionType cy2,
 								                const PositionType & xLimit, const PositionType & yLimit)
 {
@@ -717,7 +721,7 @@ void SearchExperiment::addSeparatedState(  std::vector<std::string> & unitTypes,
             {
                 type = t;
                 break;
-            } 
+            }
         }
 
         // add the symmetric unit for each count in the numUnits Vector
@@ -733,7 +737,7 @@ void SearchExperiment::addSeparatedState(  std::vector<std::string> & unitTypes,
             state2.addUnit(type, Players::Player_Two, u1);
 	    }
     }
-    
+
 	state.finishedMoving();
 
 	states.push_back(state);
@@ -770,7 +774,7 @@ svv SearchExperiment::getExpDescription(const size_t & p1Ind, const size_t & p2I
 	{
         for (size_t p2(0); p2 < players[1].size(); ++p2)
 	    {
-            std::stringstream ps;    
+            std::stringstream ps;
             ps << p1 << " vs " << p2;
             desc[0].push_back(ps.str());
         }
@@ -830,7 +834,7 @@ void SearchExperiment::runExperiment()
     {
         System::FatalError("Problem Opening Output File: Results Raw");
     }
-    
+
     // set the map file for all states
     for (size_t state(0); state < states.size(); ++state)
 	{
@@ -849,7 +853,7 @@ void SearchExperiment::runExperiment()
 	#endif
 
 	results << "   P1    P2    ST  UNIT       EVAL    RND           MS | UnitType PlayerID CurrentHP XPos YPos\n";
-    
+
 	// for each player one player
 	for (size_t p1Player(0); p1Player < players[0].size(); p1Player++)
 	{
@@ -869,7 +873,7 @@ void SearchExperiment::runExperiment()
 				resultsPlayers[1].push_back(p2Player);
 				resultsStateNumber[p1Player][p2Player].push_back(state);
 				resultsNumUnits[p1Player][p2Player].push_back(states[state].numUnits(Players::Player_One));
-				
+
 				// get player one
 				PlayerPtr playerOne(players[0][p1Player]);
 
@@ -934,12 +938,12 @@ void SearchExperiment::runExperiment()
                 results << buf;
                 printStateUnits(results, g.getState());
                 results << std::endl;
-                
+
                 writeResultsSummary();
 			}
 		}
 	}
-    
+
     results.close();
 }
 
@@ -953,7 +957,7 @@ void SearchExperiment::printStateUnits(std::ofstream & results, GameState & stat
         {
             Unit & unit(state.getUnit(p,u));
             Position pos(unit.currentPosition(state.getTime()));
-                        
+
             ss << " | " << unit.name() << " " << (int)unit.player() << " " << unit.currentHP() << " " << pos.x() << " " << pos.y();
         }
     }

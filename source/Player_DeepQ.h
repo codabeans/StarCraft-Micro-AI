@@ -45,7 +45,8 @@ namespace SparCraft
   public:
     Player_DeepQ (const IDType & playerID);
     IDType getType() { return PlayerModels::DeepQ; }
-
+    void init(GameState state);
+    void getMapDims(GameState state);
     void observeState(GameState state);
     int getControllableUnits(GameState state);
     void makeNet(GameState state);
@@ -54,11 +55,13 @@ namespace SparCraft
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
     void forward();
-    void getMoves();
+    std::vector<float> getNetOutput(GameState state);
+    void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
     void computeLoss(GameState state);
     void backward();
 
   private:
+    bool _init;
     MapState _currState;
     cv::Mat _img;
     float _loss;
