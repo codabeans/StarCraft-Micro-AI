@@ -10,6 +10,8 @@ using namespace cv;
 using namespace caffe;
 using namespace std;
 
+//constructor, sets important private member variables
+//as well as constructs our caffe network, if it can
 Player_DeepQ::Player_DeepQ (const IDType & playerID)
 {
     _playerID = playerID;
@@ -21,15 +23,20 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
     Caffe::set_mode(Caffe::GPU);
 }
 
+//check if the inputted string exists as a file
 bool fileExists(string file){
     std::ifstream ifile(file.c_str());
     return (bool)ifile;
 }
+
 //To be ran at the initialization of the Player
 //Loads the CNN as well as the weights (if there are any to load)
 void Player_DeepQ::initializeNet()
 {
     //Load the architecture from _modelFile, and init for TRAIN
+    //If the file isn't found, give a fatalerror as the player would
+    //be unable to play :'( feelsbadman.jpg
+    //caffe will give its own error(s) if something is wrong with the files
     if(fileExists(_modelFile))
         _net.reset(new Net<float>(_modelFile, TRAIN));
     else
@@ -67,16 +74,14 @@ int moveInt(IDType moveType)
     return 0;
 }
 
+//Populate _img with the game's frame, as well as load actions in _actions
 void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 {
     //get the frame, store it in _img
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
 
-    //make it upright (so its coordinate system is the same oreintation as the game)
-    flip(_img, _img, -1);
-    flip(_img, _img, 1);
-    //downscale the hell out of it (1200x720 -> 160x120)
-    resize(_img, _img, Size(160,120));
+    //Load the contents in moveVec into _actions (a vector<vector<int> >)
+    //TODO:THIS
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -95,6 +100,14 @@ void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
 void Player_DeepQ::preprocess(const Mat& img, vector<Mat>* input_channels) {
     /* Convert the input image to the input image format of the network. */
     Mat sample = img;
+
+    //make the image upright
+    //so it's coordinate system is the same oreintation as the game
+    flip(_img, _img, -1);
+    flip(_img, _img, 1);
+    //downscale the hell out of it (1200x720 -> 160x120)
+    resize(_img, _img, Size(160,120));
+
     Mat sample_float;
     sample.convertTo(sample_float, CV_32FC3);
 
@@ -102,6 +115,12 @@ void Player_DeepQ::preprocess(const Mat& img, vector<Mat>* input_channels) {
     * input layer of the network because it is wrapped by the cv::Mat
     * objects in input_channels. */
     split(sample_float, *input_channels);
+}
+
+//Load a set of actions into the network
+void Player_DeepQ::loadActions(vector<Action> & moveVec)
+{
+
 }
 
 void Player_DeepQ::forward()
@@ -153,6 +172,7 @@ void Player_DeepQ::saveDataPoint()
     //TODO: THIS
 }
 
+//Select random moves to be used as a learning experience for the network
 void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
     moveVec.clear();
@@ -161,6 +181,9 @@ void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action
         moveVec.push_back(moves.getMove(u, rand() % (moves.numMoves(u))));
     }
 }
+
+//Feed all (or at least a lot) of move sets into the network, and keep the one
+//that the network thinks is best
 void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
     //dummy code for now
