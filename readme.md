@@ -1,3 +1,5 @@
+Per Dr. David Churchill's Sparcraft repo:
+
 Compilation Instructions:
 
 Install the required libraries
