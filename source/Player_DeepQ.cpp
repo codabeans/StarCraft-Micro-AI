@@ -21,6 +21,12 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
     Caffe::set_mode(Caffe::GPU);
 }
 
+bool fileExists(string file){
+    std::ifstream ifile(file.c_str());
+    return (bool)ifile;
+}
+//To be ran at the initialization of the Player
+//Loads the CNN as well as the weights (if there are any to load)
 void Player_DeepQ::initializeNet()
 {
     //Load the architecture from _modelFile, and init for TRAIN
@@ -28,9 +34,11 @@ void Player_DeepQ::initializeNet()
 
     //Copy weights from a previously trained net of the same architecture
     //Don't have said file yet, soon!
-    //_net->CopyTrainedLayersFrom(_weightFile);
+    if(fileExists(_weightFile))
+        _net->CopyTrainedLayersFrom(_weightFile);
 }
 
+//convert the ENUM ActionTypes to int values so a NN can hopefully make sense of them
 int moveInt(IDType moveType)
 {
     if (moveType == ActionTypes::ATTACK)
@@ -59,12 +67,14 @@ int moveInt(IDType moveType)
 
 void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 {
+    //get the frame, store it in _img
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
+
+    //make it upright (so its coordinate system is the same oreintation as the game)
     flip(_img, _img, -1);
     flip(_img, _img, 1);
+    //downscale the hell out of it (1200x720 -> 160x120)
     resize(_img, _img, Size(160,120));
-    imshow("frame", _img);
-    waitKey(10);
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
