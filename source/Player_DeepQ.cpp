@@ -30,8 +30,10 @@ bool fileExists(string file){
 void Player_DeepQ::initializeNet()
 {
     //Load the architecture from _modelFile, and init for TRAIN
-    _net.reset(new Net<float>(_modelFile, TRAIN));
-
+    if(fileExists(_modelFile))
+        _net.reset(new Net<float>(_modelFile, TRAIN));
+    else
+        System::FatalError("Problem Opening Net declaration file");
     //Copy weights from a previously trained net of the same architecture
     //Don't have said file yet, soon!
     if(fileExists(_weightFile))
