@@ -22,13 +22,9 @@ namespace SparCraft
 
     std::vector<int> _friendlyID;
     std::vector<Position> _friendlyPos;
-    std::vector<int> _friendlyHpRemaining;
-    std::vector<int> _friendlyEnergy;
 
     std::vector<int> _enemyID;
     std::vector<Position> _enemyPos;
-    std::vector<int> _enemyHpRemaining;
-    std::vector<int> _enemyEnergy;
   };
 
   /*----------------------------------------------------------------------
@@ -45,15 +41,12 @@ namespace SparCraft
   public:
     Player_DeepQ (const IDType & playerID);
     IDType getType() { return PlayerModels::DeepQ; }
-    void init(GameState state);
-    void getMapDims(GameState state);
     void observeState(GameState state);
-    int getControllableUnits(GameState state);
-    void makeNet(GameState state);
     void initializeNet();
     void prepareModelInput(std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
+    void saveDataPoint();
     void forward();
     void getNetOutput();
     void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
@@ -63,7 +56,7 @@ namespace SparCraft
     void backward(GameState state);
 
 private:
-    bool _init;
+    bool _notBeginning;
     int _frameNumber;
     MapState _currState;
     cv::Mat _img;
@@ -71,5 +64,6 @@ private:
     float _futureReward;
     std::shared_ptr<caffe::Net<float> > _net;
     std::string _modelFile;
+    std::string _weightFile;
   };
 }

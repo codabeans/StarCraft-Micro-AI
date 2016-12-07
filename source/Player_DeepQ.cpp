@@ -1,7 +1,9 @@
 #include "Player_DeepQ.h"
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
 
 using namespace SparCraft;
 using namespace cv;
@@ -11,40 +13,23 @@ using namespace std;
 Player_DeepQ::Player_DeepQ (const IDType & playerID)
 {
     _playerID = playerID;
-    _init = false;
     _frameNumber = 0;
-}
-
-void Player_DeepQ::init(GameState state)
-{
-    getMapDims(state);
-    makeNet(state);
+    _notBeginning = false;
+    _modelFile = "../models/model.prototxt";
+    _weightFile = "../models/weights.prototxt";
     initializeNet();
-    observeState(state);
-    _init = true;
+    Caffe::set_mode(Caffe::GPU);
 }
 
-void Player_DeepQ::getMapDims(GameState state)
-{
-    //Pixel dimensions when no map is specifies
-    _currState._dimX = 1280;
-    _currState._dimY = 704;
-
-    //TODO: dynamically pull the arena size
-    //_currState._dimX = state.getMap()->getWalkTileWidth();
-    //_currState._dimY = state.getMap()->getWalkTileHeight();
-}
 void Player_DeepQ::observeState(GameState state)
 {
-    //get the id, location and health of every allied unit on the map
+    //get the id and location of every allied unit on the map
 
     IDType friendly(_playerID);
     for (IDType u(0); u<state.numUnits(friendly); ++u)
     {
         _currState._friendlyID.push_back(u);
         _currState._friendlyPos.push_back(state.getUnit(friendly, u).currentPosition(state.getTime()));
-        _currState._friendlyHpRemaining.push_back(state.getUnit(friendly,u).currentHP());
-        _currState._friendlyEnergy.push_back(state.getUnit(friendly,u).currentEnergy());
     }
 
     //get the  id, location and health of every enemy unit on the map
@@ -54,58 +39,17 @@ void Player_DeepQ::observeState(GameState state)
     {
         _currState._enemyID.push_back(u);
         _currState._enemyPos.push_back(state.getUnit(enemy, u).currentPosition(state.getTime()));
-        _currState._enemyHpRemaining.push_back(state.getUnit(enemy,u).currentHP());
-        _currState._enemyEnergy.push_back(state.getUnit(enemy,u).currentEnergy());
     }
-
-}
-
-// Get the total number of controllable units from GameState and use that to
-// set the number of outputs of the network
-void Player_DeepQ::makeNet(GameState state)
-{
-    int units = getControllableUnits(state);
-    string fileName = "../models/" + to_string(units) + ".prototxt";
-    _modelFile = fileName;
-
-    ofstream modelFile(fileName);
-    ifstream modelArchitectureFile("../models/example.prototxt");
-
-    string strReplace = "  input_param { shape: { dim: X dim: X dim: X dim: X } }";
-    string strNew = "  input_param { shape: { dim: 1 dim: 3 dim: " + to_string(_currState._dimX) +" dim: " + to_string(_currState._dimY) + " } }";
-
-    if(!modelFile.is_open() || !modelArchitectureFile.is_open())
-    {
-        cout << "Error opening file(s)!" << endl;
-        return;
-    }
-    string strTemp;
-    while(std::getline(modelArchitectureFile, strTemp))
-    {
-        if(strTemp == strReplace)
-        {
-            strTemp = strNew;
-        }
-        strTemp += "\n";
-        modelFile << strTemp;
-    }
-}
-
-int Player_DeepQ::getControllableUnits(GameState state)
-{
-    IDType friendly(_playerID);
-    int number_of_controllable_units = 0;
-    for (IDType u(0); u<state.numUnits(friendly); ++u)
-    {
-        number_of_controllable_units++;
-    }
-
-    return number_of_controllable_units;
 }
 
 void Player_DeepQ::initializeNet()
 {
+    //Load the architecture from _modelFile, and init for TRAIN
     _net.reset(new Net<float>(_modelFile, TRAIN));
+
+    //Copy weights from a previously trained net of the same architecture
+    //Don't have said file yet, soon!
+    //_net->CopyTrainedLayersFrom(_weightFile);
 }
 
 int moveInt(IDType moveType)
@@ -136,41 +80,10 @@ int moveInt(IDType moveType)
 
 void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 {
-    for(int i = 0; i < moveVec.size(); i++)
-    {
-        Action move = moveVec[i];
-        cout << moveInt(move.type()) << endl;
-    }
-    _img = Mat::zeros(_currState._dimY, _currState._dimX, CV_8UC(3));
-    for(uint i = 0; i < _currState._friendlyID.size(); i++)
-    {
-        Action move = moveVec[0];
-        int moveID = -1;
-        for(int j = 0; j < moveVec.size(); j++)
-        {
-            Action move = moveVec[j];
-            if(_currState._friendlyID.at(i) == int(move.unit()))
-            {
-                moveID = j;
-            }
-        }
-        if(moveID != -1)
-        {
-            move = moveVec[moveID];
-            Vec4b color(_currState._friendlyID.at(i), _currState._friendlyHpRemaining.at(i), _currState._friendlyEnergy.at(i), moveInt(move.type()), move.pos().x(), move.pos().y());
-            _img.at<Vec4b>(Point(_currState._friendlyPos.at(i).x() - 200, _currState._friendlyPos.at(i).y() - 200)) = color;
-        }
-        else
-        {
-            cout << "no match found :(" << endl;
-        }
-    }
-
-    for(uint i = 0; i < _currState._enemyID.size(); i++)
-    {
-        Vec4b color(_currState._enemyID.at(i), _currState._enemyHpRemaining.at(i), _currState._enemyEnergy.at(i), 200);
-        _img.at<Vec4b>(Point(_currState._enemyPos.at(i).x() - 200, _currState._enemyPos.at(i).y() - 200)) = color;
-    }
+    _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
+    flip(_img, _img, -1);
+    flip(_img, _img, 1);
+    resize(_img, _img, Size(320,240));
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -223,17 +136,13 @@ void Player_DeepQ::getNetOutput()
 
 void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<Action> & moveVec)
 {
-    if(!_init)
-    {
-        init(state);
-    }
     if(_frameNumber == 0)
     {
         backward(state);
 
         observeState(state);
-
-        forward();
+        if( _notBeginning)
+            saveDataPoint();
         selectRandomMoves(moves, moveVec);
         prepareModelInput(moveVec);
         forward();
@@ -246,6 +155,28 @@ void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<A
     }
 }
 
+string randomString(size_t length)
+{
+    auto randchar = []() -> char
+        {
+            const char charset[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+            const size_t max_index = (sizeof(charset) - 1);
+            return charset[ rand() % max_index ];
+        };
+    std::string str(length,0);
+    std::generate_n( str.begin(), length, randchar );
+    return str;
+}
+
+//Save the previous image and the corresponding reward
+void Player_DeepQ::saveDataPoint()
+{
+    //TODO: THIS
+}
+
 void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
     moveVec.clear();
@@ -256,7 +187,7 @@ void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action
 }
 void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
-
+    //TODO: THIS
 }
 
 void Player_DeepQ::getReward(GameState state)
@@ -268,6 +199,8 @@ void Player_DeepQ::backward(GameState state)
 {
     getReward(state);
     getNetOutput();
-    cout << "Reward: " << _reward << endl;
-    cout << "Future Reward: " << _futureReward << endl;
+    if(_futureReward != 0)
+    {
+         _notBeginning = true;
+    }
 }

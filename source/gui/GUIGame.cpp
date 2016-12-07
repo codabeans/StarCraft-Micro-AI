@@ -33,23 +33,23 @@ void GUIGame::onFrame()
             Player_UCT *        uct = dynamic_cast<Player_UCT *>        (_game.getPlayer(p).get());
             Player_AlphaBeta *  ab  = dynamic_cast<Player_AlphaBeta *>  (_game.getPlayer(p).get());
 
-            if (uct) 
-            { 
+            if (uct)
+            {
                 setParams(p, uct->getParams().getDescription());
                 setResults(p, uct->getResults().getDescription());
             }
 
-            if (ab) 
-            { 
-                setParams(p, ab->getParams().getDescription()); 
+            if (ab)
+            {
+                setParams(p, ab->getParams().getDescription());
                 setResults(p, ab->results().getDescription());
             }
         }
     }
 
-    drawParameters(5, 15);
-    drawSearchResults(5, 150);
-    drawInfo();
+    //drawParameters(5, 15);
+    //drawSearchResults(5, 150);
+    //drawInfo();
 }
 
 void GUIGame::drawInfo()
@@ -202,7 +202,7 @@ void GUIGame::drawUnit(const Unit & unit)
     {
         return;
     }
-    
+
     const int healthBoxHeight = 4;
 
     const GameState & state = _game.getState();
@@ -224,7 +224,7 @@ void GUIGame::drawUnit(const Unit & unit)
     GUITools::DrawRect(Position(xx, yy), Position(xx+cw, yy+healthBoxHeight), PlayerColors[unit.player()]);
 
     const Action & action = unit.previousAction();
-            
+
 	if (action.type() == ActionTypes::MOVE)
 	{
 		glColor4f(1, 1, 1, 0.75);
