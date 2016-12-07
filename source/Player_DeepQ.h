@@ -14,27 +14,21 @@
 
 namespace SparCraft
 {
-
-  struct MapState
-  {
-    int _dimX;
-    int _dimY;
-
-    std::vector<int> _friendlyID;
-    std::vector<Position> _friendlyPos;
-
-    std::vector<int> _enemyID;
-    std::vector<Position> _enemyPos;
-  };
-
   /*----------------------------------------------------------------------
   | Deep Q learning
   |----------------------------------------------------------------------
-  | 1) Feed the game state into a Convolutional neural network:
-  | 2) Do a forward pass of the CNN
-  | 3) Execute the moves the CNN outputs
-  | 4) Observe the game
-  | 5) Backprop based on observation
+  | Training:
+  | 1) Feed a downscaled version of the game's frmae as well as random actions
+  | 2) Observe the reward
+  | 3) Backprop based on observation
+  | Running:
+  | 1) Feed a downscaled version of the game's frame, as well as all (or a lot)
+  |     of possible actions
+  | 2) Select the action(s) that the network believes will give the highest
+  |     reward.
+  | 3) Perform said actions.
+  | 4) ????
+  | 5) Profit.
   `----------------------------------------------------------------------*/
   class Player_DeepQ : public Player
   {
@@ -58,9 +52,8 @@ namespace SparCraft
 private:
     bool _notBeginning;
     int _frameNumber;
-    MapState _currState;
     cv::Mat _img;
-    std::vector<std::vector<int> > _actions;
+    std::vector<std::vector<int> > _moves;
     float _reward;
     float _futureReward;
     std::shared_ptr<caffe::Net<float> > _net;

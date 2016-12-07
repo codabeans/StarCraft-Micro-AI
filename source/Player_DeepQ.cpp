@@ -70,18 +70,24 @@ int moveInt(IDType moveType)
     {
         return 50;
     }
-
-    return 0;
+    else
+        return 0;
 }
 
-//Populate _img with the game's frame, as well as load actions in _actions
+//Populate _img with the game's frame, as well as load actions in _moves
 void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 {
     //get the frame, store it in _img
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
 
-    //Load the contents in moveVec into _actions (a vector<vector<int> >)
-    //TODO:THIS
+    //Load the contents in moveVec into _moves (a vector<vector<int> >)
+    // ID, Action, Move X, Move Y, Move index (attackee, healee, etc.)
+    for(int i = 0; i < moveVec.size(); i++)
+    {
+        Action move = moveVec[i];
+        vector<int> unitMove{int(move.unit()), moveInt(move.type()), move.pos().x(), move.pos().y(), int(move.index())};
+        _moves.push_back(unitMove);
+    }
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -120,7 +126,7 @@ void Player_DeepQ::preprocess(const Mat& img, vector<Mat>* input_channels) {
 //Load a set of actions into the network
 void Player_DeepQ::loadActions(vector<Action> & moveVec)
 {
-
+    //TODO:THIS
 }
 
 void Player_DeepQ::forward()
