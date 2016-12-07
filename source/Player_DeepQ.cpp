@@ -21,27 +21,6 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
     Caffe::set_mode(Caffe::GPU);
 }
 
-void Player_DeepQ::observeState(GameState state)
-{
-    //get the id and location of every allied unit on the map
-
-    IDType friendly(_playerID);
-    for (IDType u(0); u<state.numUnits(friendly); ++u)
-    {
-        _currState._friendlyID.push_back(u);
-        _currState._friendlyPos.push_back(state.getUnit(friendly, u).currentPosition(state.getTime()));
-    }
-
-    //get the  id, location and health of every enemy unit on the map
-
-    IDType enemy(state.getEnemy(_playerID));
-    for (IDType u(0); u<state.numUnits(enemy); ++u)
-    {
-        _currState._enemyID.push_back(u);
-        _currState._enemyPos.push_back(state.getUnit(enemy, u).currentPosition(state.getTime()));
-    }
-}
-
 void Player_DeepQ::initializeNet()
 {
     //Load the architecture from _modelFile, and init for TRAIN
@@ -83,7 +62,9 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
     flip(_img, _img, -1);
     flip(_img, _img, 1);
-    resize(_img, _img, Size(320,240));
+    resize(_img, _img, Size(160,120));
+    imshow("frame", _img);
+    waitKey(10);
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -139,11 +120,10 @@ void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<A
     if(_frameNumber == 0)
     {
         backward(state);
-
-        observeState(state);
-        if( _notBeginning)
-            saveDataPoint();
-        selectRandomMoves(moves, moveVec);
+        if(rand() % 10 + 1 < 7)
+            selectRandomMoves(moves, moveVec);
+        else
+            selectBestMoves(moves, moveVec);
         prepareModelInput(moveVec);
         forward();
     }
@@ -155,23 +135,7 @@ void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<A
     }
 }
 
-string randomString(size_t length)
-{
-    auto randchar = []() -> char
-        {
-            const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-            const size_t max_index = (sizeof(charset) - 1);
-            return charset[ rand() % max_index ];
-        };
-    std::string str(length,0);
-    std::generate_n( str.begin(), length, randchar );
-    return str;
-}
-
-//Save the previous image and the corresponding reward
+//Save the previous image as well as the actions taken and the corresponding reward
 void Player_DeepQ::saveDataPoint()
 {
     //TODO: THIS
@@ -187,6 +151,12 @@ void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action
 }
 void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
+    //dummy code for now
+    moveVec.clear();
+    for (IDType u(0); u<moves.numUnits(); ++u)
+    {
+        moveVec.push_back(moves.getMove(u, rand() % (moves.numMoves(u))));
+    }
     //TODO: THIS
 }
 
@@ -203,4 +173,6 @@ void Player_DeepQ::backward(GameState state)
     {
          _notBeginning = true;
     }
+    if( _notBeginning)
+        saveDataPoint();
 }

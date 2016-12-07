@@ -41,7 +41,6 @@ namespace SparCraft
   public:
     Player_DeepQ (const IDType & playerID);
     IDType getType() { return PlayerModels::DeepQ; }
-    void observeState(GameState state);
     void initializeNet();
     void prepareModelInput(std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
