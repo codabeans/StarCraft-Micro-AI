@@ -1,13 +1,19 @@
 layer {
-  name: "data"
+  name: "frame"
   type: "Input"
-  top: "data"
+  top: "frame"
   input_param { shape: { dim: 1 dim: 3 dim: 162 dim: 120 } }
+}
+layer {
+  name: "actions"
+  type: "Input"
+  top: "actions"
+  input_param { shape: { dim: 1 dim: 1 dim: 100 dim: 5 } }
 }
 layer {
   name: "conv1"
   type: "Convolution"
-  bottom: "data"
+  bottom: "frame"
   top: "conv1"
   param {
     lr_mult: 1
@@ -188,6 +194,23 @@ layer {
   }
 }
 layer {
+  name: "fc6-1"
+  type: "InnerProduct"
+  bottom: "actions"
+  top: "fc6-1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 4096
+  }
+}
+layer {
   name: "fc6"
   type: "InnerProduct"
   bottom: "pool5"
@@ -220,9 +243,16 @@ layer {
   }
 }
 layer {
+  name: "concat"
+  type: "Concat"
+  bottom: "fc6"
+  bottom: "fc6-1"
+  top: "concat"
+}
+layer {
   name: "fc7"
   type: "InnerProduct"
-  bottom: "fc6"
+  bottom: "concat"
   top: "fc7"
   param {
     lr_mult: 1

@@ -19,6 +19,13 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
     _notBeginning = false;
     _modelFile = "../models/model.prototxt";
     _weightFile = "../models/weights.prototxt";
+
+    //Since _moves is a 1 1 100 5 blob,
+    //Set up the 1 1 portion of it here
+    vector<vector<vector<float> > >dummyVec1;
+    vector<vector<float> > dummyVec2;
+    _moves.push_back(dummyVec1);
+    _moves[0].push_back(dummyVec2);
     initializeNet();
     Caffe::set_mode(Caffe::GPU);
 }
@@ -80,14 +87,21 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
     //get the frame, store it in _img
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
 
-    //Load the contents in moveVec into _moves (a vector<vector<int> >)
+    //clear _moves from the previous turn
+    _moves[0][0].clear();
+
+    //Then load the contents in moveVec into _moves (a vector<vector<int> >)
     // ID, Action, Move X, Move Y, Move index (attackee, healee, etc.)
     for(int i = 0; i < moveVec.size(); i++)
     {
         Action move = moveVec[i];
-        vector<int> unitMove{int(move.unit()), moveInt(move.type()), move.pos().x(), move.pos().y(), int(move.index())};
-        _moves.push_back(unitMove);
+        vector<float> unitMove{float(move.unit()), float(moveInt(move.type())), float(move.pos().x()), float(move.pos().y()), float(move.index())};
+        _moves[0][0].push_back(unitMove);
     }
+    vector<float> emptyMove{0,0,0,0,0};
+    // for(int i = 0; i < 100-moveVec.size(); i++) {
+    //     _moves[0][0].push_back(emptyMove);
+    // }
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -124,19 +138,27 @@ void Player_DeepQ::preprocess(const Mat& img, vector<Mat>* input_channels) {
 }
 
 //Load a set of actions into the network
-void Player_DeepQ::loadActions(vector<Action> & moveVec)
+void Player_DeepQ::loadActions()
 {
-    //TODO:THIS
+    //the network stores the data as a long array of floats
+    Blob<float>* action_layer = _net->input_blobs()[1];
+    float* data = action_layer->mutable_cpu_data();
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 5; j++)
+        {
+            data[i*5+j] = _moves[0][0][i][j];
+        }
+    }
 }
 
 void Player_DeepQ::forward()
 {
-    Blob<float>* input_layer = _net->input_blobs()[0];
-
     vector<Mat> input_channels;
     wrapInputLayer(&input_channels);
-
     preprocess(_img, &input_channels);
+
+    loadActions();
 
     _net->Forward();
 }
@@ -144,7 +166,7 @@ void Player_DeepQ::forward()
 void Player_DeepQ::getNetOutput()
 {
     Blob<float>* output_layer = _net->output_blobs()[0];
-    float output;;
+    float output;
     for(int i = 0; i < 1; i++)
     {
         output = output_layer->cpu_data()[i];

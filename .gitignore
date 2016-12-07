@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 VisualStudio/Release
 VisualStudio/Debug
 bin/SparCraft
@@ -7,9 +6,9 @@ bin/*.pdb
 bin/*.map
 bin/*.dll
 bin/*.exe
+bin/*
 source/*.o
 build/*.o
-=======
 # Compiled Object files
 *.slo
 *.lo

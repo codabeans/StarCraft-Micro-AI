@@ -39,7 +39,7 @@ namespace SparCraft
     void prepareModelInput(std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
-    void loadActions(std::vector<Action> & moveVec);
+    void loadActions();
     void saveDataPoint();
     void forward();
     void getNetOutput();
@@ -53,7 +53,7 @@ private:
     bool _notBeginning;
     int _frameNumber;
     cv::Mat _img;
-    std::vector<std::vector<int> > _moves;
+    std::vector<std::vector<std::vector<std::vector<float> > > > _moves;
     float _reward;
     float _futureReward;
     std::shared_ptr<caffe::Net<float> > _net;
