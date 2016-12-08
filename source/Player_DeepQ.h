@@ -40,13 +40,13 @@ namespace SparCraft
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
     void loadActions();
-    void saveDataPoint();
     void forward();
     void getNetOutput();
     void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
     void selectRandomMoves(const MoveArray & moves, std::vector<Action> & moveVec);
     void selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec);
     void getReward(GameState state);
+    void setReward();
     void backward(GameState state);
 
 private:

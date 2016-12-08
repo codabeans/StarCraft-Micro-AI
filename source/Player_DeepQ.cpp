@@ -99,9 +99,9 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
         _moves[0][0].push_back(unitMove);
     }
     vector<float> emptyMove{0,0,0,0,0};
-    // for(int i = 0; i < 100-moveVec.size(); i++) {
-    //     _moves[0][0].push_back(emptyMove);
-    // }
+    for(int i = 0; i < 10-moveVec.size(); i++) {
+         _moves[0][0].push_back(emptyMove);
+     }
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
@@ -165,7 +165,7 @@ void Player_DeepQ::forward()
 
 void Player_DeepQ::getNetOutput()
 {
-    Blob<float>* output_layer = _net->output_blobs()[0];
+    boost::shared_ptr<Blob<float> > output_layer = _net->blob_by_name("reward");
     float output;
     for(int i = 0; i < 1; i++)
     {
@@ -192,12 +192,6 @@ void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<A
             _frameNumber == 0;
         }
     }
-}
-
-//Save the previous image as well as the actions taken and the corresponding reward
-void Player_DeepQ::saveDataPoint()
-{
-    //TODO: THIS
 }
 
 //Select random moves to be used as a learning experience for the network
@@ -228,6 +222,20 @@ void Player_DeepQ::getReward(GameState state)
     _futureReward = state.evalLTD2(_playerID);
 }
 
+void Player_DeepQ::setReward()
+{
+    //the network stores the data as a long array of floats
+    Blob<float>* action_layer = _net->input_blobs()[2];
+    float* data = action_layer->mutable_cpu_data();
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 5; j++)
+        {
+            data[0] = _futureReward;
+        }
+    }
+}
+
 void Player_DeepQ::backward(GameState state)
 {
     getReward(state);
@@ -237,5 +245,11 @@ void Player_DeepQ::backward(GameState state)
          _notBeginning = true;
     }
     if( _notBeginning)
+    {
+        setReward();
+        _net->Backward();
+        _net->Update();
+        cout << "Actual: " << _reward << " Expected: " << _futureReward << endl;
         saveDataPoint();
+    }
 }
