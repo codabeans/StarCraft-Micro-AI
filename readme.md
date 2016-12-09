@@ -41,6 +41,11 @@ Build the project
 make all
 ```
 
+Note: The makefile desperately needs an face-lift. It puts all the .o files in the same folder that it gets the .cpp
+files. When I find time, expect major code file structure changes (include/ and src/) as well as a cleaner makefile 
+that puts the .o files into a /build directory. In a perfect world this project would have a CMakeLists.txt that finds
+Caffe as well as BWAPI.
+
 ## Usage
 
 The executable will be in bin/, so navigate to that directory, and run 
