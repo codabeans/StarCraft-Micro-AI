@@ -1,4 +1,4 @@
-# Project Name
+# Deepcraft
 
 This project is a clone of David Churhill's Sparcraft with the addition of one extra bot, DeepQ. 
 As the name suggests, this bot utilizes deep q learning to learn how to play. I am in the process
