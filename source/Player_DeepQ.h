@@ -38,7 +38,7 @@ namespace SparCraft
     void initializeNet();
     void prepareModelInput(std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
-    void preprocess(const cv::Mat& img,std::vector<cv::Mat>* input_channels);
+    void preprocess(std::vector<cv::Mat>* input_channels);
     void loadActions();
     void forward();
     void getNetOutput();

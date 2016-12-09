@@ -104,43 +104,44 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
      }
 }
 
-void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels) {
+void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels)
+{
     Blob<float>* input_layer = _net->input_blobs()[0];
 
     int width = input_layer->width();
     int height = input_layer->height();
     float* input_data = input_layer->mutable_cpu_data();
     for (int i = 0; i < input_layer->channels(); ++i) {
-        Mat channel(height, width, CV_32FC1, input_data);
+        Mat channel(height, width, CV_8UC1, input_data);
         input_channels->push_back(channel);
         input_data += width * height;
     }
 }
 
-void Player_DeepQ::preprocess(const Mat& img, vector<Mat>* input_channels) {
-    /* Convert the input image to the input image format of the network. */
-    Mat sample = img;
-
+void Player_DeepQ::preprocess(vector<Mat>* input_channels)
+{
     //make the image upright
     //so it's coordinate system is the same oreintation as the game
     flip(_img, _img, -1);
     flip(_img, _img, 1);
-    //downscale the hell out of it (1200x720 -> 160x120)
-    resize(_img, _img, Size(160,120));
-
-    Mat sample_float;
-    sample.convertTo(sample_float, CV_32FC3);
+    //downscale the hell out of it (1200x720 -> 320x240)
+    resize(_img, _img, Size(320,240));
 
     /* This operation will write the separate BGR planes directly to the
-    * input layer of the network because it is wrapped by the cv::Mat
-    * objects in input_channels. */
-    split(sample_float, *input_channels);
+     * input layer of the network because it is wrapped by the cv::Mat
+     * objects in input_channels. */
+    cv::split(_img, *input_channels);
+
+    for(int i=0; i < 3; i++)
+    {
+        input_channels->at(i).convertTo(input_channels->at(i), CV_32FC1);
+    }
 }
 
 //Load a set of actions into the network
 void Player_DeepQ::loadActions()
 {
-    //the network stores the data as a long array of floats
+    //caffe stores the data as a long array of floats stored in a pointer
     Blob<float>* action_layer = _net->input_blobs()[1];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
@@ -156,7 +157,7 @@ void Player_DeepQ::forward()
 {
     vector<Mat> input_channels;
     wrapInputLayer(&input_channels);
-    preprocess(_img, &input_channels);
+    preprocess( &input_channels);
 
     loadActions();
 
@@ -219,12 +220,12 @@ void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> 
 
 void Player_DeepQ::getReward(GameState state)
 {
-    _futureReward = state.evalLTD2(_playerID);
+    _futureReward = state.evalLTD2(_playerID) + 1000;
 }
 
 void Player_DeepQ::setReward()
 {
-    //the network stores the data as a long array of floats
+    //caffe stores the data as a long array of floats stored in a pointer
     Blob<float>* action_layer = _net->input_blobs()[2];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
@@ -239,17 +240,16 @@ void Player_DeepQ::setReward()
 void Player_DeepQ::backward(GameState state)
 {
     getReward(state);
-    getNetOutput();
     if(_futureReward != 0)
     {
          _notBeginning = true;
     }
-    if( _notBeginning)
+    if(_notBeginning)
     {
+        getNetOutput();
         setReward();
         _net->Backward();
         _net->Update();
         cout << "Actual: " << _reward << " Expected: " << _futureReward << endl;
-        saveDataPoint();
     }
 }

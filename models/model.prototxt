@@ -213,8 +213,14 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 1000
   }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "fc6-1"
+  top: "fc6-1"
 }
 layer {
   name: "fc6"
@@ -230,8 +236,14 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 1000
   }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
 }
 layer {
   name: "drop6"
@@ -263,8 +275,14 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 1000
   }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
 }
 layer {
   name: "drop7"
@@ -297,5 +315,5 @@ layer {
   type: "EuclideanLoss"
   bottom: "reward"
   bottom: "label"
-  top: "diff"
+  top: "loss"
 }
