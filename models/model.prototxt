@@ -217,12 +217,6 @@ layer {
   }
 }
 layer {
-  name: "relu5"
-  type: "ReLU"
-  bottom: "fc6-1"
-  top: "fc6-1"
-}
-layer {
   name: "fc6"
   type: "InnerProduct"
   bottom: "pool5"
@@ -239,12 +233,7 @@ layer {
     num_output: 1000
   }
 }
-layer {
-  name: "relu5"
-  type: "ReLU"
-  bottom: "fc6"
-  top: "fc6"
-}
+
 layer {
   name: "drop6"
   type: "Dropout"
@@ -277,12 +266,6 @@ layer {
   inner_product_param {
     num_output: 1000
   }
-}
-layer {
-  name: "relu5"
-  type: "ReLU"
-  bottom: "fc7"
-  top: "fc7"
 }
 layer {
   name: "drop7"

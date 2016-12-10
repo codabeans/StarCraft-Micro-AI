@@ -17,7 +17,7 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
     _playerID = playerID;
     _frameNumber = 0;
     _notBeginning = false;
-    _modelFile = "../models/model.prototxt";
+    _solverFile = "../models/solver.prototxt";
     _weightFile = "../models/weights.prototxt";
 
     //Since _moves is a 1 1 100 5 blob,
@@ -40,18 +40,22 @@ bool fileExists(string file){
 //Loads the CNN as well as the weights (if there are any to load)
 void Player_DeepQ::initializeNet()
 {
-    //Load the architecture from _modelFile, and init for TRAIN
+    //Load the architecture from _solverFile, and init for TRAIN
     //If the file isn't found, give a fatalerror as the player would
     //be unable to play :'( feelsbadman.jpg
     //caffe will give its own error(s) if something is wrong with the files
-    if(fileExists(_modelFile))
-        _net.reset(new Net<float>(_modelFile, TRAIN));
+    if(fileExists(_solverFile))
+    {
+        caffe::SolverParameter solver_param;
+        caffe::ReadProtoFromTextFileOrDie(_solverFile, &solver_param);
+        _solver.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
+    }
     else
-        System::FatalError("Problem Opening Net declaration file");
+        System::FatalError("Problem Opening Solver file");
     //Copy weights from a previously trained net of the same architecture
     //Don't have said file yet, soon!
     if(fileExists(_weightFile))
-        _net->CopyTrainedLayersFrom(_weightFile);
+        _solver->net()->CopyTrainedLayersFrom(_weightFile);
 }
 
 //convert the ENUM ActionTypes to int values so a NN can hopefully make sense of them
@@ -106,7 +110,7 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels)
 {
-    Blob<float>* input_layer = _net->input_blobs()[0];
+    Blob<float>* input_layer = _solver->net()->input_blobs()[0];
 
     int width = input_layer->width();
     int height = input_layer->height();
@@ -142,7 +146,7 @@ void Player_DeepQ::preprocess(vector<Mat>* input_channels)
 void Player_DeepQ::loadActions()
 {
     //caffe stores the data as a long array of floats stored in a pointer
-    Blob<float>* action_layer = _net->input_blobs()[1];
+    Blob<float>* action_layer = _solver->net()->input_blobs()[1];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
     {
@@ -161,12 +165,12 @@ void Player_DeepQ::forward()
 
     loadActions();
 
-    _net->Forward();
+    _solver->net()->Forward();
 }
 
 void Player_DeepQ::getNetOutput()
 {
-    boost::shared_ptr<Blob<float> > output_layer = _net->blob_by_name("reward");
+    boost::shared_ptr<Blob<float> > output_layer = _solver->net()->blob_by_name("reward");
     float output;
     for(int i = 0; i < 1; i++)
     {
@@ -220,13 +224,13 @@ void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> 
 
 void Player_DeepQ::getReward(GameState state)
 {
-    _futureReward = state.evalLTD2(_playerID) + 1000;
+    _futureReward = state.evalLTD2(_playerID);
 }
 
 void Player_DeepQ::setReward()
 {
     //caffe stores the data as a long array of floats stored in a pointer
-    Blob<float>* action_layer = _net->input_blobs()[2];
+    Blob<float>* action_layer = _solver->net()->input_blobs()[2];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
     {
@@ -248,8 +252,8 @@ void Player_DeepQ::backward(GameState state)
     {
         getNetOutput();
         setReward();
-        _net->Backward();
-        _net->Update();
+        _solver->net()->Backward();
+        _solver->net()->Update();
         cout << "Actual: " << _reward << " Expected: " << _futureReward << endl;
     }
 }

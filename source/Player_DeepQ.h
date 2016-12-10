@@ -56,8 +56,8 @@ private:
     std::vector<std::vector<std::vector<std::vector<float> > > > _moves;
     float _reward;
     float _futureReward;
-    std::shared_ptr<caffe::Net<float> > _net;
-    std::string _modelFile;
+    std::shared_ptr<caffe::Solver<float> > _solver;
+    std::string _solverFile;
     std::string _weightFile;
   };
 }
