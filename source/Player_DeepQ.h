@@ -48,14 +48,16 @@ namespace SparCraft
     void getReward(GameState state);
     void setReward();
     void backward(GameState state);
+    void logDataPoint();
 
 private:
+    bool _logData;
     bool _notBeginning;
     int _frameNumber;
     cv::Mat _img;
-    std::vector<std::vector<std::vector<std::vector<float> > > > _moves;
-    float _reward;
-    float _futureReward;
+    std::vector<std::vector<float> > _moves;
+    float _predictedReward;
+    float _actualReward;
     std::shared_ptr<caffe::Solver<float> > _solver;
     std::string _solverFile;
     std::string _weightFile;

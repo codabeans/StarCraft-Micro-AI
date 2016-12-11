@@ -16,16 +16,11 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
 {
     _playerID = playerID;
     _frameNumber = 0;
+    _logData = true;
     _notBeginning = false;
     _solverFile = "../models/solver.prototxt";
     _weightFile = "../models/weights.prototxt";
 
-    //Since _moves is a 1 1 100 5 blob,
-    //Set up the 1 1 portion of it here
-    vector<vector<vector<float> > >dummyVec1;
-    vector<vector<float> > dummyVec2;
-    _moves.push_back(dummyVec1);
-    _moves[0].push_back(dummyVec2);
     initializeNet();
     Caffe::set_mode(Caffe::GPU);
 }
@@ -40,6 +35,8 @@ bool fileExists(string file){
 //Loads the CNN as well as the weights (if there are any to load)
 void Player_DeepQ::initializeNet()
 {
+    //TODO: Supress Caffe's output for initializing the net
+
     //Load the architecture from _solverFile, and init for TRAIN
     //If the file isn't found, give a fatalerror as the player would
     //be unable to play :'( feelsbadman.jpg
@@ -92,7 +89,7 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
     _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
 
     //clear _moves from the previous turn
-    _moves[0][0].clear();
+    _moves.clear();
 
     //Then load the contents in moveVec into _moves (a vector<vector<int> >)
     // ID, Action, Move X, Move Y, Move index (attackee, healee, etc.)
@@ -100,11 +97,11 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
     {
         Action move = moveVec[i];
         vector<float> unitMove{float(move.unit()), float(moveInt(move.type())), float(move.pos().x()), float(move.pos().y()), float(move.index())};
-        _moves[0][0].push_back(unitMove);
+        _moves.push_back(unitMove);
     }
     vector<float> emptyMove{0,0,0,0,0};
     for(int i = 0; i < 10-moveVec.size(); i++) {
-         _moves[0][0].push_back(emptyMove);
+         _moves.push_back(emptyMove);
      }
 }
 
@@ -152,7 +149,7 @@ void Player_DeepQ::loadActions()
     {
         for(int j = 0; j < 5; j++)
         {
-            data[i*5+j] = _moves[0][0][i][j];
+            data[i*5+j] = _moves[i][j];
         }
     }
 }
@@ -161,7 +158,7 @@ void Player_DeepQ::forward()
 {
     vector<Mat> input_channels;
     wrapInputLayer(&input_channels);
-    preprocess( &input_channels);
+    preprocess(&input_channels);
 
     loadActions();
 
@@ -176,7 +173,7 @@ void Player_DeepQ::getNetOutput()
     {
         output = output_layer->cpu_data()[i];
     }
-    _reward =  output;
+    _predictedReward =  output;
 }
 
 void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<Action> & moveVec)
@@ -213,18 +210,19 @@ void Player_DeepQ::selectRandomMoves(const MoveArray & moves, std::vector<Action
 //that the network thinks is best
 void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec)
 {
+    //TODO: THIS
+
     //dummy code for now
     moveVec.clear();
     for (IDType u(0); u<moves.numUnits(); ++u)
     {
         moveVec.push_back(moves.getMove(u, rand() % (moves.numMoves(u))));
     }
-    //TODO: THIS
 }
 
 void Player_DeepQ::getReward(GameState state)
 {
-    _futureReward = state.evalLTD2(_playerID);
+    _actualReward = state.evalLTD2(_playerID);
 }
 
 void Player_DeepQ::setReward()
@@ -236,7 +234,7 @@ void Player_DeepQ::setReward()
     {
         for(int j = 0; j < 5; j++)
         {
-            data[0] = _futureReward;
+            data[0] = _actualReward;
         }
     }
 }
@@ -244,16 +242,81 @@ void Player_DeepQ::setReward()
 void Player_DeepQ::backward(GameState state)
 {
     getReward(state);
-    if(_futureReward != 0)
+    if(_actualReward != 0)
     {
          _notBeginning = true;
     }
     if(_notBeginning)
     {
         getNetOutput();
-        setReward();
-        _solver->net()->Backward();
-        _solver->net()->Update();
-        cout << "Actual: " << _reward << " Expected: " << _futureReward << endl;
+
+        //No need to do back prop if we're just gathering data
+        if(!_logData)
+        {
+            setReward();
+            //do the actual learning
+            _solver->net()->Backward();
+            _solver->net()->Update();
+
+            //Monitoring purposes, REMOVE FOR FINAL VERSION
+            cout << "Predicted: " << _predictedReward << " Actual: " << _actualReward << endl;
+        }
     }
+    logDataPoint();
+}
+
+//This creates a messy file as the action layer is just a  of size 10x5.
+//image_dir action[0][0] action[0][1] ... action[10][5] labelapp
+void Player_DeepQ::logDataPoint()
+{
+    //make sure that we have an image (the first run through won't)
+    if(_img.empty() || _img.rows == 0 || _img.cols == 0 || !_logData || !fileExists("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp"))
+        return;
+
+    //TODO: Make this work on any computer. AKA don't hard code an absolute path,
+    //but I'm lazy tonight and want to get this working first.
+    char imgFile[] = "/home/faust/Documents/starcraft-ai/data/images/XXXXXX";
+    int fd = mkstemp(imgFile);
+    //check to make sure the generated file name doesn't exist before we save
+    //the image
+    while(fileExists(string(imgFile).append(".png")))
+    {
+        fd = mkstemp(imgFile);
+        if(fd == -1){
+            cout << "Error generating file name" << endl;
+            //should we break here, or keep trying...?
+        }
+    }
+    //remove the generated file, all we care about is the name that we got from it
+    //use it and abuse it lose it.
+    if(remove(imgFile))
+    {
+        //not the end of the world, but if this happens a lot, then it will clutter
+        //up the image/ folder with empty files.
+        cout << "Error deleting file" << endl;
+    }
+    //save the image
+    imwrite(string(imgFile).append(".png"), _img);
+
+    //open file where we will log the data
+    ofstream dataFile;
+    //TODO: Make this work on any computer. AKA don't hard code an absolute path,
+    //but I'm lazy tonight and want to get this working first.
+    dataFile.open("/home/faust/Documents/starcraft-ai/data/train.txt", std::ios::app);
+
+    //img dir
+    dataFile << string(imgFile).append(".png") << " ";
+
+    //moves
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = 0; j < 5; j++)
+        {
+        dataFile << _moves[i][j] << " ";
+        }
+    }
+
+    //reward plus new line to prepare for the next data point
+    dataFile << _actualReward << endl;
+
 }
