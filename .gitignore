@@ -9,6 +9,7 @@ bin/*.exe
 bin/*
 source/*.o
 build/*.o
+data/*
 # Compiled Object files
 *.slo
 *.lo
