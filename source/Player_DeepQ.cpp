@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include <boost/filesystem.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
 
@@ -23,6 +24,10 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
 
     initializeNet();
     Caffe::set_mode(Caffe::GPU);
+
+    //create the directory for logging data
+    boost::filesystem::create_directory("../data");
+    boost::filesystem::create_directory("../data/images");
 }
 
 //check if the inputted string exists as a file
@@ -86,7 +91,7 @@ int moveInt(IDType moveType)
 void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
 {
     //get the frame, store it in _img
-    _img = imread("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp", CV_LOAD_IMAGE_COLOR);
+    _img = imread("frame.bmp", CV_LOAD_IMAGE_COLOR);
 
     //clear _moves from the previous turn
     _moves.clear();
@@ -265,47 +270,44 @@ void Player_DeepQ::backward(GameState state)
     logDataPoint();
 }
 
+string GenerateRandomString(int length)
+{
+    string randomString;
+    for(int i = 0; i < length; i++)
+    {
+        char randomChar = 'A' + (random() % 26);
+        randomString.push_back(randomChar);
+    }
+    return randomString;
+}
+
 //This creates a messy file as the action layer is just a  of size 10x5.
 //image_dir action[0][0] action[0][1] ... action[10][5] labelapp
 void Player_DeepQ::logDataPoint()
 {
     //make sure that we have an image (the first run through won't)
-    if(_img.empty() || _img.rows == 0 || _img.cols == 0 || !_logData || !fileExists("/home/faust/Documents/starcraft-ai/deepcraft/bin/frame.bmp"))
+    if(_img.empty() || _img.rows == 0 || _img.cols == 0 || !_logData)
         return;
 
-    //TODO: Make this work on any computer. AKA don't hard code an absolute path,
-    //but I'm lazy tonight and want to get this working first.
-    char imgFile[] = "/home/faust/Documents/starcraft-ai/data/images/XXXXXX";
-    int fd = mkstemp(imgFile);
+    string imgFile = GenerateRandomString(15);;
     //check to make sure the generated file name doesn't exist before we save
     //the image
-    while(fileExists(string(imgFile).append(".png")))
+
+    while(fileExists(imgFile.append(".png")))
     {
-        fd = mkstemp(imgFile);
-        if(fd == -1){
-            cout << "Error generating file name" << endl;
-            //should we break here, or keep trying...?
-        }
+        imgFile = GenerateRandomString(15);
     }
-    //remove the generated file, all we care about is the name that we got from it
-    //use it and abuse it lose it.
-    if(remove(imgFile))
-    {
-        //not the end of the world, but if this happens a lot, then it will clutter
-        //up the image/ folder with empty files.
-        cout << "Error deleting file" << endl;
-    }
+
     //save the image
-    imwrite(string(imgFile).append(".png"), _img);
+    imwrite("../data/images/" + string(imgFile).append(".png"), _img);
 
     //open file where we will log the data
     ofstream dataFile;
-    //TODO: Make this work on any computer. AKA don't hard code an absolute path,
-    //but I'm lazy tonight and want to get this working first.
-    dataFile.open("/home/faust/Documents/starcraft-ai/data/train.txt", std::ios::app);
+
+    dataFile.open("../data/train.txt", std::ios::app);
 
     //img dir
-    dataFile << string(imgFile).append(".png") << " ";
+    dataFile << imgFile.append(".png") << " ";
 
     //moves
     for(int i = 0; i < 10; i++)
