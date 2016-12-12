@@ -1,6 +1,5 @@
 PROJECT := caffe
 
-
 BWAPI		=		/home/faust/Documents/starcraft-ai/bwapi
 CAFFE		=		/home/faust/Documents/caffe
 
@@ -25,6 +24,7 @@ BWAPI_SRCS 	:= 		$(shell find $(BWAPI)/bwapi/BWAPILIB/ -name "*.cpp" -printf '%P
 BWAPI_OBJS 	:= 		$(addprefix $(BWAPI)/bwapi/build/, ${BWAPI_SRCS:%.cpp=%.o})
 
 BWAPISRCS 	:=		$(addprefix $(BWAPI)/bwapi/BWAPILIB/, ${BWAPI_SRCS})
+
 #---------------------------------------------------------------------------------
 # make a list of all the build dirs to make the folders
 #---------------------------------------------------------------------------------
@@ -73,8 +73,6 @@ LIBS		= 		-lGL -lGLU -lSDL2_image \
  					$(SDL_LDFLAGS) -lboost_filesystem \
 					-lcaffe
 
-
-
 LDFLAGS		=		$(LIBS)
 
 ifeq ($(USE_CUDNN), 1)
@@ -101,7 +99,6 @@ $(BUILD)/%.o:$(SOURCE)/%.cpp
 $(BWAPI_BUILD)%.o:$(BWAPI)/bwapi/BWAPILIB/%.cpp
 	@ echo CXX BWAPI/$*
 	@$(CXX) $(INCLUDEPATH) $(CXXFLAGS) -c $^ -o $@ $(INCLUDE)
-
 
 # Cleanup
 clean:
