@@ -49,13 +49,10 @@ CUDNN 		= 	1
 ## Compiling
 	
 ```bash
-make all
+make
 ```
 
-Note: The makefile desperately needs an face-lift. It puts all the .o files in the same folder that it gets the .cpp
-files. When I find time, expect major code file structure changes (include/ and src/) as well as a cleaner makefile 
-that puts the .o files into a /build directory. In a perfect world this project would have a CMakeLists.txt that finds
-Caffe as well as BWAPI.
+To speed up compilation time, pass the flag -jX where X is your number of cores. 
 
 ## Usage
 
