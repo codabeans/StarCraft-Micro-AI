@@ -10,7 +10,7 @@ unit type.
 
 [Caffe](https://github.com/BVLC/caffe)
 
-Deepcraft offers GPU support with CUDNN accerlation, so feel free to compile caffe those as well
+Deepcraft offers GPU support with CUDNN acceleration, so feel free to compile caffe those as well
 
 Install the required libraries for the bwapi
 
