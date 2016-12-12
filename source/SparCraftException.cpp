@@ -1,4 +1,4 @@
-#include "SparCraftException.h"
+#include "../include/SparCraftException.h"
 
 using namespace SparCraft;
 

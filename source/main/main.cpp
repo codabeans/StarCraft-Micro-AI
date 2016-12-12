@@ -3,8 +3,8 @@
 #define APIENTRYP
 #endif
 
-#include "../SparCraft.h"
-#include "SearchExperiment.h"
+#include "../../include/SparCraft.h"
+#include "../../include/main/SearchExperiment.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +33,6 @@ int main(int argc, char *argv[])
             std::cerr << "\nUnknown Exception, Shutting Down\n\n";
         }
     }
-   
+
     return 0;
 }

@@ -1,5 +1,5 @@
-#include "SparCraftAssert.h"
-#include "SparCraftException.h"
+#include "../include/SparCraftAssert.h"
+#include "../include/SparCraftException.h"
 
 #include <cstring>
 

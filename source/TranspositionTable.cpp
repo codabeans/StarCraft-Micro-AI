@@ -1,4 +1,4 @@
-#include "TranspositionTable.h"
+#include "../include/TranspositionTable.h"
 
 using namespace SparCraft;
 

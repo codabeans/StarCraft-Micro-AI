@@ -1,11 +1,11 @@
-#include "GUITools.h"
-#include "GUI.h"
+#include "../../include/gui/GUITools.h"
+#include "../../include/gui/GUI.h"
 
 namespace SparCraft
 {
 namespace GUITools
 {
-    void DrawString(const Position & p, const std::string & text, const GLfloat * rgba) 
+    void DrawString(const Position & p, const std::string & text, const GLfloat * rgba)
     {
         Position origin(p);
         Position fontSize(8,8);
@@ -13,9 +13,9 @@ namespace GUITools
         int linePos = 0;
         for (size_t i(0); i < text.length(); ++i)
         {
-            if (text[i] == '\n') 
-            { 
-                origin = Position(p.x(), origin.y() + fontSize.y()); 
+            if (text[i] == '\n')
+            {
+                origin = Position(p.x(), origin.y() + fontSize.y());
                 linePos = 0;
             }
             else
@@ -24,8 +24,8 @@ namespace GUITools
                 Position charEnd = charStart + fontSize;
 
                 DrawChar(charStart, charEnd, text[i], rgba);
-                    
-                linePos++;    
+
+                linePos++;
             }
         }
     }
@@ -33,11 +33,11 @@ namespace GUITools
     const size_t FontTextureSize = 128;
     const size_t CharSize = 8;
     const float CharDelta = 1.0f / 16.0f;
-    void DrawChar(const Position & tl, const Position & br, char ch, const GLfloat * rgba) 
+    void DrawChar(const Position & tl, const Position & br, char ch, const GLfloat * rgba)
     {
         float xPos = ((ch % 16) / 16.0f);
         float yPos = (ch >> 4) / 16.0f;
-        
+
         glPushMatrix();
             glEnable( GL_TEXTURE_2D );
                 glColor4fv(rgba);
@@ -55,7 +55,7 @@ namespace GUITools
     void DrawLine(const Position & p1, const Position & p2, const float thickness, const GLfloat * rgba)
     {
         glPushMatrix();
-            glLineWidth(thickness); 
+            glLineWidth(thickness);
             glColor4fv(rgba);
             glBegin(GL_LINES);
                 glVertex2i(p1.x(),p1.y());
@@ -64,27 +64,27 @@ namespace GUITools
         glPopMatrix();
     }
 
-    void DrawCircle(const Position & pos, float r, int num_segments) 
-    { 
-        float theta = 2 * (float)3.1415926 / float(num_segments); 
+    void DrawCircle(const Position & pos, float r, int num_segments)
+    {
+        float theta = 2 * (float)3.1415926 / float(num_segments);
         float c = cosf(theta);//precalculate the sine and cosine
         float s = sinf(theta);
         float t;
 
-        float x = r;//we start at angle = 0 
-        float y = 0; 
+        float x = r;//we start at angle = 0
+        float y = 0;
 
-        glBegin(GL_LINE_LOOP); 
-            for(int ii = 0; ii < num_segments; ii++) 
-            { 
-                glVertex2f(x + pos.x(), y + pos.y());//output vertex 
+        glBegin(GL_LINE_LOOP);
+            for(int ii = 0; ii < num_segments; ii++)
+            {
+                glVertex2f(x + pos.x(), y + pos.y());//output vertex
 
                 //apply the rotation matrix
                 t = x;
                 x = c * x - s * y;
                 y = s * t + c * y;
-            } 
-        glEnd(); 
+            }
+        glEnd();
     }
 
     void DrawRect(const Position & tl, const Position & br, const GLfloat * rgba)
@@ -111,7 +111,7 @@ namespace GUITools
             glEnd();
         glPopMatrix();
     }
-  
+
     void DrawTexturedRect(const Position & tl, const Position & br, const int & textureID, const GLfloat * rgba)
     {
         glPushMatrix();
@@ -134,9 +134,9 @@ namespace GUITools
         Position iconSize = br - tl;
         Position statusNumPos = tl + Position(-iconSize.scale(0.15f).x(), iconSize.scale(0.4f).y());
         GUITools::DrawTexturedRect(tl, br, textureID, rgba);
-        GUITools::DrawTexturedRect(statusNumPos, statusNumPos + iconSize.scale(0.65f), textureID2, rgba); 
+        GUITools::DrawTexturedRect(statusNumPos, statusNumPos + iconSize.scale(0.65f), textureID2, rgba);
     }
 
-    
+
 }
 }

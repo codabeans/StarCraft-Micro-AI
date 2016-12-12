@@ -1,4 +1,4 @@
-#include "WeaponProperties.h"
+#include "../include/WeaponProperties.h"
 
 using namespace SparCraft;
 using namespace BWAPI::UpgradeTypes;

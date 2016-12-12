@@ -1,4 +1,4 @@
-#include "UnitProperties.h"
+#include "../include/UnitProperties.h"
 
 using namespace SparCraft;
 using namespace BWAPI::UpgradeTypes;

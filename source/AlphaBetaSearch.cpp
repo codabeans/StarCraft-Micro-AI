@@ -1,4 +1,4 @@
-#include "AlphaBetaSearch.h"
+#include "../include/AlphaBetaSearch.h"
 
 using namespace SparCraft;
 

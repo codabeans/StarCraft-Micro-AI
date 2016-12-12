@@ -1,4 +1,4 @@
-#include "PortfolioGreedySearch.h"
+#include "../include/PortfolioGreedySearch.h"
 
 using namespace SparCraft;
 

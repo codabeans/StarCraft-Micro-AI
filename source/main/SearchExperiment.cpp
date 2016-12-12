@@ -1,4 +1,4 @@
-#include "SearchExperiment.h"
+#include "../../include/main/SearchExperiment.h"
 
 using namespace SparCraft;
 
@@ -495,6 +495,13 @@ void SearchExperiment::addPlayer(const std::string & line)
         if (strcmp(GPUstring.c_str(), "true") == 0)
         {
             GPU = true;
+        }
+        else if (strcmp(GPUstring.c_str(), "false") == 0)
+        {
+                GPU = false;
+        }
+        else {
+            System::FatalError("Invalid GPU Parameter for DeepQ");
         }
         DeepQParameters params;
         params.setGPU(GPU);

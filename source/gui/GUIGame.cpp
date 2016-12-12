@@ -1,6 +1,6 @@
-#include "GUIGame.h"
-#include "GUITools.h"
-#include "GUI.h"
+#include "../../include/gui/GUIGame.h"
+#include "../../include/gui/GUITools.h"
+#include "../../include/gui/GUI.h"
 
 using namespace SparCraft;
 

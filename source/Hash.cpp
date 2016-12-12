@@ -1,4 +1,4 @@
-#include "Hash.h"
+#include "../include/Hash.h"
 
 using namespace SparCraft;
 

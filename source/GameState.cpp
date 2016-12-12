@@ -1,6 +1,6 @@
-#include "GameState.h"
-#include "Player.h"
-#include "Game.h"
+#include "../include/GameState.h"
+#include "../include/Player.h"
+#include "../include/Game.h"
 
 using namespace SparCraft;
 
@@ -72,7 +72,7 @@ void GameState::finishedMoving()
 		hpSum[p] = 0;
 
 		for (IDType u(0); u<numUnits(p); ++u)
-		{ 
+		{
             hpSum[p] += getUnit(p, u).currentHP();
         }
     }
@@ -125,12 +125,12 @@ void GameState::generateMoves(MoveArray & moves, const IDType & playerIndex) con
 	// we are interested in all simultaneous moves
 	// so return all units which can move at the same time as the first
 	TimeType firstUnitMoveTime = getUnit(playerIndex, 0).firstTimeFree();
-		
+
 	for (IDType unitIndex(0); unitIndex < _numUnits[playerIndex]; ++unitIndex)
 	{
 		// unit reference
 		const Unit & unit(getUnit(playerIndex,unitIndex));
-			
+
 		// if this unit can't move at the same time as the first
 		if (unit.firstTimeFree() != firstUnitMoveTime)
 		{
@@ -199,7 +199,7 @@ void GameState::generateMoves(MoveArray & moves, const IDType & playerIndex) con
 				moves.add(Action(unitIndex, playerIndex, ActionTypes::RELOAD, 0));
 			}
 		}
-		
+
 		// generate movement moves
 		if (unit.isMobile())
 		{
@@ -227,10 +227,10 @@ void GameState::generateMoves(MoveArray & moves, const IDType & playerIndex) con
 
             // we are only generating moves in the cardinal direction specified in common.h
 			for (IDType d(0); d<Constants::Num_Directions; ++d)
-			{			
+			{
                 // the direction of this movement
               	Position dir(Constants::Move_Dir[d][0], Constants::Move_Dir[d][1]);
-            
+
                 if (moveDistance == 0)
                 {
                     printf("%lf %lf %lf\n", timeUntilAttack, defaultMoveDuration, chosenTime);
@@ -258,7 +258,7 @@ void GameState::generateMoves(MoveArray & moves, const IDType & playerIndex) con
 
 
 void GameState::makeMoves(const std::vector<Action> & moves)
-{    
+{
     if (moves.size() > 0)
     {
         const IDType canMove(whoCanMove());
@@ -268,7 +268,7 @@ void GameState::makeMoves(const std::vector<Action> & moves)
             System::FatalError("GameState Error - Called makeMove() for a player that cannot currently move");
         }
     }
-    
+
     for (size_t m(0); m<moves.size(); ++m)
     {
         performAction(moves[m]);
@@ -285,13 +285,13 @@ void GameState::performAction(const Action & move)
 	{
 		Unit & enemyUnit(getUnit(enemyPlayer,move.index()));
         //Unit & enemyUnit(getUnitByID(enemyPlayer ,move.index()));
-			
+
 		// attack the unit
 		ourUnit.attack(move, enemyUnit, _currentTime);
-			
+
 		// enemy unit takes damage if it is alive
 		if (enemyUnit.isAlive())
-		{				
+		{
 			enemyUnit.takeAttack(ourUnit);
 
 			// check to see if enemy unit died
@@ -300,7 +300,7 @@ void GameState::performAction(const Action & move)
 				// if it died, remove it
 				_numUnits[enemyPlayer]--;
 			}
-		}			
+		}
 	}
 	else if (move.type() == ActionTypes::MOVE)
 	{
@@ -311,10 +311,10 @@ void GameState::performAction(const Action & move)
 	else if (move.type() == ActionTypes::HEAL)
 	{
 		Unit & ourOtherUnit(getUnit(player,move.index()));
-			
+
 		// attack the unit
 		ourUnit.heal(move, ourOtherUnit, _currentTime);
-			
+
 		if (ourOtherUnit.isAlive())
 		{
 			ourOtherUnit.takeHeal(ourUnit);
@@ -361,7 +361,7 @@ const Unit & GameState::getUnitByID(const IDType & player, const IDType & unitID
 	return getUnit(0,0);
 }
 
-Unit & GameState::getUnitByID(const IDType & player, const IDType & unitID) 
+Unit & GameState::getUnitByID(const IDType & player, const IDType & unitID)
 {
 	for (IDType u(0); u<numUnits(player); ++u)
 	{
@@ -610,13 +610,13 @@ void GameState::sortUnits()
                 _unitIndex[p][iHole] = itemIndex;
 				//_unitPtrs[p][iHole] = item;
 			}*/
-	
-			
+
+
 			//_unitPtrs[p].sort(_prevNumUnits[p], UnitPtrCompare());
             std::sort(&_unitIndex[p][0], &_unitIndex[p][0] + _prevNumUnits[p], UnitIndexCompare(*this, p));
 			_prevNumUnits[p] = _numUnits[p];
 		}
-	}	
+	}
 }
 
 Unit & GameState::getUnit(const IDType & player, const UnitCountType & unitIndex)
@@ -775,7 +775,7 @@ const StateEvalScore GameState::eval(const IDType & player, const IDType & evalM
 const ScoreType GameState::evalLTD(const IDType & player) const
 {
 	const IDType enemyPlayer(getEnemy(player));
-	
+
 	return LTD(player) - LTD(enemyPlayer);
 }
 
@@ -978,7 +978,7 @@ const bool GameState::isTerminal() const
 			}
 		}
 	}
-	
+
 	// if everyone is immobile and nobody can attack, then there is a deadlock
 	return true;
 }
@@ -1087,8 +1087,8 @@ std::string GameState::toStringCompact() const
 
 void GameState::write(const std::string & filename) const
 {
-    std::ofstream fout (filename.c_str(), std::ios::out | std::ios::binary); 
-    fout.write((char *)this, sizeof(*this)); 
+    std::ofstream fout (filename.c_str(), std::ios::out | std::ios::binary);
+    fout.write((char *)this, sizeof(*this));
     fout.close();
 }
 

@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "../include/Logger.h"
 
 using namespace SparCraft;
 

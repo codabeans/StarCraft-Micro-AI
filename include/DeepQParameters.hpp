@@ -10,7 +10,7 @@ namespace SparCraft
 class SparCraft::DeepQParameters
 {
 public:
-    DeepQParameters(): _GPU(true) {}
+    DeepQParameters(): _GPU(false) {}
     void setGPU(bool value) { _GPU = value; }
     bool getGPU() { return _GPU; }
 private:

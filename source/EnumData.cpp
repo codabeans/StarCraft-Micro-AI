@@ -1,4 +1,4 @@
-#include "EnumData.h"
+#include "../include/EnumData.h"
 
 using namespace SparCraft;
 

@@ -1,4 +1,4 @@
-#include "MoveArray.h"
+#include "../include/MoveArray.h"
 
 using namespace SparCraft;
 

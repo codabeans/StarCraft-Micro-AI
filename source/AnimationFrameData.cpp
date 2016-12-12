@@ -1,4 +1,4 @@
-#include "AnimationFrameData.h"
+#include "../include/AnimationFrameData.h"
 
 using namespace SparCraft;
 

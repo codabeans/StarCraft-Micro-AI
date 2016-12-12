@@ -1,4 +1,4 @@
-#include "AllPlayers.h"
+#include "../include/AllPlayers.h"
 
 using namespace SparCraft;
 

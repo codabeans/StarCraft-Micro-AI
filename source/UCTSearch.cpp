@@ -1,4 +1,4 @@
-#include "UCTSearch.h"
+#include "../include/UCTSearch.h"
 
 using namespace SparCraft;
 

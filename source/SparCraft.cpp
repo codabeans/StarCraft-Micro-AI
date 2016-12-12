@@ -1,4 +1,4 @@
-#include "SparCraft.h"
+#include "../include/SparCraft.h"
 
 namespace SparCraft
 {

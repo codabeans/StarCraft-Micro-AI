@@ -105,7 +105,7 @@ Player 1 DeepQ true
 #State StateDescriptionFile 10 PATH_TO\sample_state.txt
 
 # Sample SeparatedState States
-State SeparatedState 10000 128 128 400 360 840 360 Protoss_Dragoon 10
+State SeparatedState 2500 128 128 400 360 840 360 Protoss_Dragoon 10
 
 # Sample Symmetric State States
 #State StateSymmetric 10 128 128 Protoss_Dragoon 8

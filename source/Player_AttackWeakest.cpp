@@ -1,4 +1,4 @@
-#include "Player_AttackWeakest.h"
+#include "../include/Player_AttackWeakest.h"
 
 using namespace SparCraft;
 

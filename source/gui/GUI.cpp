@@ -1,4 +1,4 @@
-#include "GUI.h"
+#include "../../include/gui/GUI.h"
 #include "BWAPI.h"
 #include <cassert>
 #include <iostream>
@@ -10,7 +10,7 @@ const int GUI::TextureFont                 = 256;
 
 GLfloat ColorWhite[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-GUI::GUI(int width, int height) 
+GUI::GUI(int width, int height)
     : _initialWidth(width)
     , _initialHeight(height)
     , _cameraX(0)
@@ -123,7 +123,7 @@ void GUI::handleEvents()
                     break;
                 case SDLK_p:
                 {
-                    
+
                 }
                 }
                 break;
@@ -146,7 +146,7 @@ void GUI::handleEvents()
             case SDL_MOUSEBUTTONDOWN:
             {
 
-			
+
                 break;
             }
             case SDL_MOUSEBUTTONUP:
@@ -159,7 +159,7 @@ void GUI::handleEvents()
             }
             case SDL_WINDOWEVENT_RESIZED:
             {
-            
+
                 break;
             }
             case SDL_QUIT:
@@ -187,11 +187,11 @@ void GUI::render()
         glPushMatrix();
         {
             glTranslatef(static_cast<float>(-_cameraX),static_cast<float>(-_cameraY),0);
-              
+
             _guiGame.onFrame();
 
             //drawAllBWAPIUnits();
-            
+
             //GUITools::DrawTexturedRect(Position(0,0), Position(200,200), TextureFont, ColorWhite);
             //GUITools::DrawString(Position(300, 300), "Test String", ColorWhite);
         }
@@ -257,9 +257,9 @@ void GUI::drawAllBWAPIUnits()
         }
 
         GUITools::DrawTexturedRect(p, p + _textureSizes[id], id, ColorWhite);
-            
+
         maxHeight = std::max((size_t)_textureSizes[id].y(), maxHeight);
-            
+
         p = p + (Position(_textureSizes[id].x(), 0));
     }
 }
@@ -310,7 +310,7 @@ void GUI::loadTextures()
             textureNumber++;
         }
     }
-    
+
     loadTexture(TextureFont, imageDir + "fonts/alpha_trans.png");
 
     std::cout << "\n\nSuccessfully loaded " << textureNumber << " textures\n\n";
@@ -336,14 +336,14 @@ bool GUI::loadTexture(int textureNumber, const std::string & fileName)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, texture_format, surface2->w, surface2->h, 0, texture_format, GL_UNSIGNED_BYTE, surface2->pixels);
-    } 
-    else 
+    }
+    else
     {
         printf("SDL could not load image: %s\n", SDL_GetError());
-    }    
+    }
 
-    if (surface2) 
-    { 
+    if (surface2)
+    {
         _textureSizes[textureNumber] = Position(surface2->w, surface2->h);
         SDL_FreeSurface( surface2 );
     }
@@ -353,7 +353,7 @@ bool GUI::loadTexture(int textureNumber, const std::string & fileName)
     return true;
 }
 
-bool GUI::saveScreenshotBMP(const std::string & filename) 
+bool GUI::saveScreenshotBMP(const std::string & filename)
 {
     SDL_Surface * image = SDL_CreateRGBSurface(SDL_SWSURFACE, width(), height(), 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
 

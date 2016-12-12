@@ -1,4 +1,4 @@
-#include "Player_KiterDPS.h"
+#include "../include/Player_KiterDPS.h"
 
 using namespace SparCraft;
 

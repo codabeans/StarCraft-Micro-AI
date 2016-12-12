@@ -1,4 +1,4 @@
-#include "UnitScriptData.h"
+#include "../include/UnitScriptData.h"
 
 using namespace SparCraft;
 

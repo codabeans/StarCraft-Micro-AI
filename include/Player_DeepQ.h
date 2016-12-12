@@ -4,11 +4,19 @@
 #include "Player.h"
 #include <opencv2/core/core.hpp>
 #include <vector>
+#include <stdio.h>
+#include <stdlib.h>
 #include <memory>
 #include <algorithm>
 #include <iosfwd>
 #include <string>
 #include <utility>
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <boost/filesystem.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
 #include "DeepQParameters.hpp"
 
 #include <caffe/caffe.hpp>

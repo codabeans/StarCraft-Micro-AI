@@ -1,4 +1,4 @@
-#include "AlphaBetaMove.h"
+#include "../include/AlphaBetaMove.h"
 
 using namespace SparCraft;
 

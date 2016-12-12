@@ -1,10 +1,4 @@
-#include "Player_DeepQ.h"
-#include <fstream>
-#include <iostream>
-#include <stdlib.h>
-#include <boost/filesystem.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
+#include "../include/Player_DeepQ.h"
 
 using namespace SparCraft;
 using namespace cv;
@@ -51,10 +45,6 @@ bool fileExists(string file)
 //Loads the CNN as well as the weights (if there are any to load)
 void Player_DeepQ::initializeNet()
 {
-    //TODO: Supress Caffe's output for initializing the net
-    //Right now it is done through passing GLOG_minloglevel=3 as a
-    //arg when running SparCraft
-
     //Load the architecture from _modelFile, and init for TRAIN
     //If the file isn't found, give a fatalerror as the player would
     //be unable to play :'( feelsbadman.jpg

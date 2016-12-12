@@ -1,4 +1,4 @@
-#include "Action.h"
+#include "../include/Action.h"
 
 using namespace SparCraft;
 
