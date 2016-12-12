@@ -29,7 +29,7 @@ git clone https://github.com/bwapi/bwapi.git
 Edit the Makefile to point to the directory that you cloned BWAPI
 
 ```bash
-BWAPI=/where_you_cloned_to/bwapi/bwapi'  (yes, bwapi/bwapi)
+BWAPI=/where_you_cloned_to/bwapi'
 ```
 
 If your BWAPI directory doesn't contain the file svnrev.h, you need to generate it using the vbs script in that dir
