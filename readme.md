@@ -29,7 +29,7 @@ git clone https://github.com/bwapi/bwapi.git
 Edit the Makefile to point to the directory that you cloned BWAPI
 
 ```bash
-BWAPI=/where_you_cloned_to/bwapi'
+BWAPI=/where_you_cloned_to/bwapi
 ```
 
 If your BWAPI directory doesn't contain the file svnrev.h, you need to generate it using the vbs script in that dir
@@ -38,7 +38,7 @@ If your BWAPI directory doesn't contain the file svnrev.h, you need to generate 
 Edit the Makefile to point to the directory that you have Caffe compiled
 
 ```bash
-CAFFE=/where_you_cloned_to/caffe' 
+CAFFE=/where_you_cloned_to/caffe
 ```
 
 Set The CUDNN flag in the makefile if applicable
