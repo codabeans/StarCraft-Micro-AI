@@ -74,4 +74,4 @@ Enjoy!
 
 ## Credits
 
-This wouldn't have been possible without David Churhill's Sparcraft.
+This wouldn't have been possible without Dave Churchill's Sparcraft.
