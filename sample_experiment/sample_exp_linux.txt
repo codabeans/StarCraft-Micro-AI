@@ -16,6 +16,13 @@
 #  |---------------------------------------------------------|
 #  | Player X ScriptName                                     |
 #  '---------------------------------------------------------'
+#  ,---------------------------------------------------------,
+#  | DeepQ Player Syntax                                     |
+#  |---------------------------------------------------------|
+#  | Player X DeepQ GPU                                      |
+#  '---------------------------------------------------------|
+#  |                BOOL                                     |
+#  '---------------------------------------------------------'
 #
 #  ,----------------------------------------------------------,
 #  | Portfolio Greedy Search Player Syntax                    |
@@ -65,7 +72,7 @@ Player 0 PortfolioGreedySearch 0 NOKDPS 1 0
 # Sample Scripted Players
 #Player 0 NOKDPS
 #Player 1 NOKDPS
-Player 1 DeepQ
+Player 1 DeepQ true
 ####################################################
 #
 # Set player upgrade and tech levels
@@ -98,8 +105,7 @@ Player 1 DeepQ
 #State StateDescriptionFile 10 PATH_TO\sample_state.txt
 
 # Sample SeparatedState States
-State SeparatedState 100 128 128 400 360 840 360 Protoss_Dragoon 10
-State SeparatedState 100 128 128 400 360 840 360 Zerg_Zergling 10
+State SeparatedState 10000 128 128 400 360 840 360 Protoss_Dragoon 10
 
 # Sample Symmetric State States
 #State StateSymmetric 10 128 128 Protoss_Dragoon 8

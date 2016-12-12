@@ -462,10 +462,6 @@ void SearchExperiment::addPlayer(const std::string & line)
     {
         players[playerID].push_back(PlayerPtr(new Player_AttackWeakest(playerID)));
     }
-    else if (playerModelID == PlayerModels::DeepQ)
-    {
-        players[playerID].push_back(PlayerPtr(new Player_DeepQ(playerID)));
-    }
 	else if (playerModelID == PlayerModels::Kiter)
     {
         players[playerID].push_back(PlayerPtr(new Player_Kiter(playerID)));
@@ -489,6 +485,22 @@ void SearchExperiment::addPlayer(const std::string & line)
 	else if (playerModelID == PlayerModels::Random)
     {
         players[playerID].push_back(PlayerPtr(new Player_Random(playerID)));
+    }
+    else if (playerModelID == PlayerModels::DeepQ)
+    {
+        std::string GPUstring;
+        bool GPU;
+        //read in the values
+        iss >> GPUstring;
+        if (strcmp(GPUstring.c_str(), "true") == 0)
+        {
+            GPU = true;
+        }
+        DeepQParameters params;
+        params.setGPU(GPU);
+
+        PlayerPtr DeepQPlayer(new Player_DeepQ(playerID, params));
+        players[playerID].push_back(DeepQPlayer);
     }
     else if (playerModelID == PlayerModels::PortfolioGreedySearch)
     {

@@ -13,17 +13,27 @@ using namespace std;
 
 //constructor, sets important private member variables
 //as well as constructs our caffe network, if it can
-Player_DeepQ::Player_DeepQ (const IDType & playerID)
+Player_DeepQ::Player_DeepQ(const IDType & playerID, const DeepQParameters & params)
 {
     _playerID = playerID;
+    _params = params;
     _frameNumber = 0;
     _logData = true;
     _notBeginning = false;
-    _solverFile = "../models/solver.prototxt";
+    _modelFile = "../models/model.prototxt";
     _weightFile = "../models/weights.prototxt";
 
     initializeNet();
-    Caffe::set_mode(Caffe::GPU);
+
+    //Per the parameter, set the hardware usage in caffe
+    if(_params.getGPU())
+    {
+        Caffe::set_mode(Caffe::GPU);
+    }
+    else
+    {
+        Caffe::set_mode(Caffe::CPU);
+    }
 
     //create the directory for logging data
     boost::filesystem::create_directory("../data");
@@ -31,7 +41,8 @@ Player_DeepQ::Player_DeepQ (const IDType & playerID)
 }
 
 //check if the inputted string exists as a file
-bool fileExists(string file){
+bool fileExists(string file)
+{
     std::ifstream ifile(file.c_str());
     return (bool)ifile;
 }
@@ -41,27 +52,25 @@ bool fileExists(string file){
 void Player_DeepQ::initializeNet()
 {
     //TODO: Supress Caffe's output for initializing the net
+    //Right now it is done through passing GLOG_minloglevel=3 as a
+    //arg when running SparCraft
 
-    //Load the architecture from _solverFile, and init for TRAIN
+    //Load the architecture from _modelFile, and init for TRAIN
     //If the file isn't found, give a fatalerror as the player would
     //be unable to play :'( feelsbadman.jpg
     //caffe will give its own error(s) if something is wrong with the files
-    if(fileExists(_solverFile))
-    {
-        caffe::SolverParameter solver_param;
-        caffe::ReadProtoFromTextFileOrDie(_solverFile, &solver_param);
-        _solver.reset(caffe::SolverRegistry<float>::CreateSolver(solver_param));
-    }
+    if(fileExists(_modelFile))
+        _net.reset(new Net<float>(_modelFile, TRAIN));
     else
-        System::FatalError("Problem Opening Solver file");
+        System::FatalError("Problem Opening Model file");
     //Copy weights from a previously trained net of the same architecture
     //Don't have said file yet, soon!
     if(fileExists(_weightFile))
-        _solver->net()->CopyTrainedLayersFrom(_weightFile);
+        _net->CopyTrainedLayersFrom(_weightFile);
 }
 
 //convert the ENUM ActionTypes to int values so a NN can hopefully make sense of them
-int moveInt(IDType moveType)
+int moveInt(const IDType moveType)
 {
     if (moveType == ActionTypes::ATTACK)
     {
@@ -88,7 +97,7 @@ int moveInt(IDType moveType)
 }
 
 //Populate _img with the game's frame, as well as load actions in _moves
-void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
+void Player_DeepQ::prepareModelInput(const vector<Action> & moveVec)
 {
     //get the frame, store it in _img
     _img = imread("frame.bmp", CV_LOAD_IMAGE_COLOR);
@@ -105,14 +114,15 @@ void Player_DeepQ::prepareModelInput(vector<Action> & moveVec)
         _moves.push_back(unitMove);
     }
     vector<float> emptyMove{0,0,0,0,0};
-    for(int i = 0; i < 10-moveVec.size(); i++) {
-         _moves.push_back(emptyMove);
-     }
+    for(int i = 0; i < 10-moveVec.size(); i++)
+    {
+        _moves.push_back(emptyMove);
+    }
 }
 
 void Player_DeepQ::wrapInputLayer(vector<Mat>* input_channels)
 {
-    Blob<float>* input_layer = _solver->net()->input_blobs()[0];
+    Blob<float>* input_layer = _net->input_blobs()[0];
 
     int width = input_layer->width();
     int height = input_layer->height();
@@ -148,7 +158,7 @@ void Player_DeepQ::preprocess(vector<Mat>* input_channels)
 void Player_DeepQ::loadActions()
 {
     //caffe stores the data as a long array of floats stored in a pointer
-    Blob<float>* action_layer = _solver->net()->input_blobs()[1];
+    Blob<float>* action_layer = _net->input_blobs()[1];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
     {
@@ -167,12 +177,12 @@ void Player_DeepQ::forward()
 
     loadActions();
 
-    _solver->net()->Forward();
+    _net->Forward();
 }
 
 void Player_DeepQ::getNetOutput()
 {
-    boost::shared_ptr<Blob<float> > output_layer = _solver->net()->blob_by_name("reward");
+    boost::shared_ptr<Blob<float> > output_layer = _net->blob_by_name("reward");
     float output;
     for(int i = 0; i < 1; i++)
     {
@@ -193,7 +203,8 @@ void Player_DeepQ::getMoves(GameState & state, const MoveArray & moves, vector<A
         prepareModelInput(moveVec);
         forward();
     }
-    else {
+    else
+    {
         _frameNumber ++;
         if(_frameNumber > 4){
             _frameNumber == 0;
@@ -225,7 +236,7 @@ void Player_DeepQ::selectBestMoves(const MoveArray & moves, std::vector<Action> 
     }
 }
 
-void Player_DeepQ::getReward(GameState state)
+void Player_DeepQ::getReward(const GameState state)
 {
     _actualReward = state.evalLTD2(_playerID);
 }
@@ -233,7 +244,7 @@ void Player_DeepQ::getReward(GameState state)
 void Player_DeepQ::setReward()
 {
     //caffe stores the data as a long array of floats stored in a pointer
-    Blob<float>* action_layer = _solver->net()->input_blobs()[2];
+    Blob<float>* action_layer = _net->input_blobs()[2];
     float* data = action_layer->mutable_cpu_data();
     for(int i = 0; i < 10; i++)
     {
@@ -244,7 +255,7 @@ void Player_DeepQ::setReward()
     }
 }
 
-void Player_DeepQ::backward(GameState state)
+void Player_DeepQ::backward(const GameState state)
 {
     getReward(state);
     if(_actualReward != 0)
@@ -260,17 +271,17 @@ void Player_DeepQ::backward(GameState state)
         {
             setReward();
             //do the actual learning
-            _solver->net()->Backward();
-            _solver->net()->Update();
+            _net->Backward();
+            _net->Update();
 
             //Monitoring purposes, REMOVE FOR FINAL VERSION
             cout << "Predicted: " << _predictedReward << " Actual: " << _actualReward << endl;
         }
     }
-    logDataPoint();
+    //logDataPoint();
 }
 
-string GenerateRandomString(int length)
+string GenerateRandomString(const int length)
 {
     string randomString;
     for(int i = 0; i < length; i++)
@@ -314,7 +325,7 @@ void Player_DeepQ::logDataPoint()
     {
         for(int j = 0; j < 5; j++)
         {
-        dataFile << _moves[i][j] << " ";
+            dataFile << _moves[i][j] << " ";
         }
     }
 

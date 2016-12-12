@@ -19,7 +19,7 @@ GUIGame::GUIGame(GUI & gui)
 void GUIGame::onFrame()
 {
     drawGame();
-    drawHPBars();
+    //drawHPBars();
 
     Timer turnTimer;
     turnTimer.start();

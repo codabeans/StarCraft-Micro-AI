@@ -2,7 +2,7 @@
 
 using namespace SparCraft;
 
-UnitScriptData::UnitScriptData() 
+UnitScriptData::UnitScriptData()
 {
 }
 
@@ -50,7 +50,7 @@ const IDType & UnitScriptData::getUnitScript(const IDType & player, const int & 
 {
     return (*_unitScriptMap[player].find(id)).second;
 }
-    
+
 const IDType & UnitScriptData::getUnitScript(const Unit & unit) const
 {
     return getUnitScript(unit.player(), unit.ID());
@@ -79,7 +79,7 @@ void UnitScriptData::setUnitScript(const IDType & player, const int & id, const 
         _scriptVec[player].push_back(script);
         _playerPtrVec[player].push_back(PlayerPtr(AllPlayers::getPlayerPtr(player, script)));
     }
-        
+
     _unitScriptMap[player][id] = script;
 }
 

@@ -9,6 +9,7 @@
 #include <iosfwd>
 #include <string>
 #include <utility>
+#include "DeepQParameters.hpp"
 
 #include <caffe/caffe.hpp>
 
@@ -18,7 +19,7 @@ namespace SparCraft
   | Deep Q learning
   |----------------------------------------------------------------------
   | Training:
-  | 1) Feed a downscaled version of the game's frmae as well as random actions
+  | 1) Feed a downscaled version of the game's frame as well as random actions
   | 2) Observe the reward
   | 3) Backprop based on observation
   | Running:
@@ -33,10 +34,10 @@ namespace SparCraft
   class Player_DeepQ : public Player
   {
   public:
-    Player_DeepQ (const IDType & playerID);
+    Player_DeepQ (const IDType & playerID, const DeepQParameters & params);
     IDType getType() { return PlayerModels::DeepQ; }
     void initializeNet();
-    void prepareModelInput(std::vector<Action> & moveVec);
+    void prepareModelInput(const std::vector<Action> & moveVec);
     void wrapInputLayer(std::vector<cv::Mat>* input_channels);
     void preprocess(std::vector<cv::Mat>* input_channels);
     void loadActions();
@@ -45,21 +46,22 @@ namespace SparCraft
     void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
     void selectRandomMoves(const MoveArray & moves, std::vector<Action> & moveVec);
     void selectBestMoves(const MoveArray & moves, std::vector<Action> & moveVec);
-    void getReward(GameState state);
+    void getReward(const GameState state);
     void setReward();
-    void backward(GameState state);
+    void backward(const GameState state);
     void logDataPoint();
 
 private:
     bool _logData;
     bool _notBeginning;
+    DeepQParameters _params;
     int _frameNumber;
     cv::Mat _img;
     std::vector<std::vector<float> > _moves;
     float _predictedReward;
     float _actualReward;
-    std::shared_ptr<caffe::Solver<float> > _solver;
-    std::string _solverFile;
+    std::shared_ptr<caffe::Net<float> > _net;
+    std::string _modelFile;
     std::string _weightFile;
   };
 }
