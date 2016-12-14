@@ -7,4 +7,4 @@ of training one scenario, and once it is done, then I will upload the .caffemode
 Down the line, I would like to have one model capable of doing matches X units vs Y units for any 
 unit type. 
 
-[Installation instructions](http://caffe.berkeleyvision.org/installation.html)
+[Installation instructions](https://github.com/TuringsEgo/deepcraft/blob/master/INSTALL.md)
