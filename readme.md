@@ -1,3 +1,4 @@
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 # Deepcraft
 
 This project is a clone of Dave Churchill's Sparcraft with the addition of one extra bot, DeepQ. 
