@@ -50,6 +50,10 @@ To speed up compilation time, pass the flag -jX where X is your number of cores.
 
 ## Usage
 
+To suppress Caffe's network initialization output
+```bash
+export GLOG_minloglevel=3
+```
 The executable will be in bin/, so navigate to that directory, and run 
 
 ```bash
