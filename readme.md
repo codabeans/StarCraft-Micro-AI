@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
-# DeepQwaft
+# DeepQraft
 
 This project is a clone of Dave Churchill's Sparcraft with the addition of one extra bot, DeepQ. 
 As the name suggests, this bot utilizes deep q learning to learn how to play. I am in the process
