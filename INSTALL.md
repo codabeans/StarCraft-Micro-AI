@@ -2,10 +2,6 @@
 
 ## Dependencies 
 
-[Caffe](https://github.com/BVLC/caffe)
-
-Deepcraft offers GPU support with CUDNN acceleration, so feel free to compile caffe those as well
-
 Install the required libraries for the bwapi
 
 ```bash
@@ -28,17 +24,6 @@ BWAPI=/where_you_cloned_to/bwapi
 
 If your BWAPI directory doesn't contain the file svnrev.h, you need to generate it using the vbs script in that dir
    (note: this may have to be done in windows, but you can just copy the generated .h files to Linux and it will work)
- 
-Edit the Makefile to point to the directory that you have Caffe compiled
-
-```bash
-CAFFE=/where_you_cloned_to/caffe
-```
-
-Set The CUDNN flag in the makefile if applicable
-```bash
-CUDNN 		= 	1
-```
 
 ## Compiling
 	
@@ -50,10 +35,6 @@ To speed up compilation time, pass the flag -jX where X is your number of cores.
 
 ## Usage
 
-To suppress Caffe's network initialization output
-```bash
-export GLOG_minloglevel=3
-```
 The executable will be in bin/, so navigate to that directory, and run 
 
 ```bash
