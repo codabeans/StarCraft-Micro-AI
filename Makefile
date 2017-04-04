@@ -1,10 +1,6 @@
 PROJECT := caffe
 
 BWAPI		=		/home/faust/Documents/StarCraft/bwapi
-CAFFE		=		/home/faust/Documents/caffe
-
-#If you don't have cudnn installed, set to 0
-USE_CUDNN	=		1
 
 SOURCE		:= 		source
 BUILD		:=		build
@@ -74,13 +70,9 @@ LIBS		= -lGL -lGLU -lSDL2_image \
 					-lopencv_imgproc  -lopencv_imgcodecs \
 					-lboost_system -lglog \
 					-L$(CAFFE)/build/lib -lboost_filesystem \
- 					-lcaffe -lprotobuf $(SDL_LDFLAGS)
+ 					-lprotobuf $(SDL_LDFLAGS)
 
 LDFLAGS		=		$(LIBS)
-
-ifeq ($(USE_CUDNN), 1)
-	LDFLAGS += 		-lcudnn
-endif
 
 all: protoc_middleman build_dirs lib link
 
