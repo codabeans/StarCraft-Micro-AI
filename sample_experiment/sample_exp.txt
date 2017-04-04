@@ -60,12 +60,12 @@
 #Player 0 UCT 40 1.6 5000 20 ScriptFirst Playout NOKDPS NOKDPS Alternate NOKDPS
 
 # Sample PortfolioGreedySearch Players
-Player 0 PortfolioGreedySearch 0 NOKDPS 1 0
+#Player 0 PortfolioGreedySearch 0 NOKDPS 1 0
 
 # Sample Scripted Players
-#Player 0 NOKDPS
+Player 0 NOKDPS
 #Player 1 NOKDPS
-Player 1 DeepQ
+Player 1 DeepQ true
 
 ####################################################
 #

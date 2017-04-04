@@ -19,7 +19,7 @@ GUIGame::GUIGame(GUI & gui)
 void GUIGame::onFrame()
 {
     drawGame();
-    //drawHPBars();
+    drawHPBars();
 
     Timer turnTimer;
     turnTimer.start();
@@ -47,9 +47,9 @@ void GUIGame::onFrame()
         }
     }
 
-    //drawParameters(5, 15);
-    //drawSearchResults(5, 150);
-    //drawInfo();
+    drawParameters(5, 15);
+    drawSearchResults(5, 150);
+    drawInfo();
 }
 
 void GUIGame::drawInfo()
@@ -112,21 +112,21 @@ void GUIGame::drawHPBars()
                 GUITools::DrawRectGradient(Position(xx,yy),Position(xx+cw,yy+h),PlayerColors[p], PlayerColorsDark[p]);
             }
 
-            //if (unit.ID() < 255)
-            //{
-            //	glEnable( GL_TEXTURE_2D );
-            //		glBindTexture( GL_TEXTURE_2D, unit.type().getID() );
+            if (unit.ID() < 255)
+            {
+            	glEnable( GL_TEXTURE_2D );
+            		glBindTexture( GL_TEXTURE_2D, unit.type().getID() );
 
-            //		// draw the unit to the screen
-            //		glColor4f(1, 1, 1, 1);
-            //		glBegin( GL_QUADS );
-            //			glTexCoord3d(0.0,0.0,.5); glVertex2i(xx, yy);
-            //			glTexCoord3d(0.0,1.0,.5); glVertex2i(xx, yy+h);
-            //			glTexCoord3d(1.0,1.0,.5); glVertex2i(xx+h,yy+h);
-            //			glTexCoord3d(1.0,0.0,.5); glVertex2i(xx+h, yy);
-            //		glEnd();
-            //	glDisable( GL_TEXTURE_2D );
-            //}
+            		// draw the unit to the screen
+            		glColor4f(1, 1, 1, 1);
+            		glBegin( GL_QUADS );
+            			glTexCoord3d(0.0,0.0,.5); glVertex2i(xx, yy);
+            			glTexCoord3d(0.0,1.0,.5); glVertex2i(xx, yy+h);
+            			glTexCoord3d(1.0,1.0,.5); glVertex2i(xx+h,yy+h);
+            			glTexCoord3d(1.0,0.0,.5); glVertex2i(xx+h, yy);
+            		glEnd();
+            	glDisable( GL_TEXTURE_2D );
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 PROJECT := caffe
 
-BWAPI		=		/home/faust/Documents/starcraft-ai/bwapi
+BWAPI		=		/home/faust/Documents/StarCraft/bwapi
 CAFFE		=		/home/faust/Documents/caffe
 
 #If you don't have cudnn installed, set to 0
@@ -12,7 +12,7 @@ BWAPI_BUILD	:=		$(BWAPI)/bwapi/build/
 INCLUDE		:= 		include
 
 #Target name
-TARGET		:=		bin/Sparcraft
+TARGET		:=		bin/StarCraft-Micro-AI
 
 #---------------------------------------------------------------------------------
 # automatically build a list of object files for our project
@@ -36,8 +36,9 @@ BUILD_DIRS 	+= 		$(addprefix $(BUILD)/, $(SRC_DIRS))
 
 SRCDIRS 	:=		$(addprefix $(SOURCE)/, ${SRC_DIRS})
 
-BWAPI_SRC_DIRS	:= 	$(shell find $(BWAPI)/bwapi/BWAPILIB/ -type d -exec bash -c "find {} -maxdepth 1 \
-					\( -name '*.cpp' \) | grep -q ." \; -printf '%P\n')
+BWAPI_SRC_DIRS	:= 		$(shell find $(BWAPI)/bwapi/BWAPILIB/ -type d -exec bash -c "find {} -maxdepth 1 \
+				\( -name '*.cpp' \) | grep -q ." \; -printf '%P\n')
+
 BWAPI_BUILD_DIRS	=		$(BWAPI)/bwapi/build/
 BWAPI_BUILD_DIRS	+=		$(addprefix $(BWAPI)/bwapi/build/, ${BWAPI_SRC_DIRS})
 
@@ -56,22 +57,24 @@ export INCLUDE		=		$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 							-I$(CURDIR)/$(BUILD)
 
 # Linking flags
-INCLUDEPATH = 		-I$(BWAPI)/bwapi \
+INCLUDEPATH 		= 		-I$(BWAPI)/bwapi \
 					-I$(BWAPI)/bwapi/include \
 					-I$(BWAPI)/bwapi/include/BWAPI \
 					-I$(CAFFE)/include \
-					-I/usr/local/cuda/include
+					-I/usr/local/cuda/include \
+					-I/usr/local/include \
+					-I/usr/local/lib
 
 SDL_LDFLAGS	=		`sdl2-config --libs`
 SDL_CFLAGS	=		`sdl2-config --cflags`
-CXXFLAGS	=		-O3 -w -Wall -std=c++11 $(SDL_CFLAGS)
+CXXFLAGS		=		-O3 -w -Wall -std=c++11 $(SDL_CFLAGS)
 
-LIBS		= 		-lGL -lGLU -lSDL2_image \
+LIBS		= -lGL -lGLU -lSDL2_image \
 					-lopencv_core -lopencv_highgui \
-					-lopencv_imgproc -lboost_system \
-					-lglog -L$(CAFFE)/build/lib \
- 					$(SDL_LDFLAGS) -lboost_filesystem \
-					-lcaffe
+					-lopencv_imgproc  -lopencv_imgcodecs \
+					-lboost_system -lglog \
+					-L$(CAFFE)/build/lib -lboost_filesystem \
+ 					-lcaffe -lprotobuf $(SDL_LDFLAGS)
 
 LDFLAGS		=		$(LIBS)
 
@@ -79,7 +82,11 @@ ifeq ($(USE_CUDNN), 1)
 	LDFLAGS += 		-lcudnn
 endif
 
-all: build_dirs lib link
+all: protoc_middleman build_dirs lib link
+
+protoc_middleman: sparcraft.proto
+	protoc --cpp_out=. --java_out=. --python_out=. sparcraft.proto
+	@touch protoc_middleman
 
 build_dirs: $(ALL_BUILD_DIRS)
 
@@ -87,6 +94,7 @@ lib: $(BWAPI_OBJS) $(OBJS) $(OBJS)
 
 link:
 	@echo linking ...
+	@mkdir -p bin
 	@$(LD) $(OBJS) $(BWAPI_OBJS) $(LDFLAGS) -o $(TARGET)
 
 $(ALL_BUILD_DIRS):
@@ -104,5 +112,4 @@ $(BWAPI_BUILD)%.o:$(BWAPI)/bwapi/BWAPILIB/%.cpp
 clean:
 	@echo clean ...
 	@rm -rf $(BUILD)
-	@rm -rf $(BWAPI_BUILD)
 	@rm -f $(TARGET)
