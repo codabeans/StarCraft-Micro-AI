@@ -488,26 +488,8 @@ void SearchExperiment::addPlayer(const std::string & line)
     }
     else if (playerModelID == PlayerModels::DeepQ)
     {
-        std::string GPUstring;
-        bool GPU;
-        //read in the values
-        iss >> GPUstring;
-        if (strcmp(GPUstring.c_str(), "true") == 0)
-        {
-            GPU = true;
-        }
-        else if (strcmp(GPUstring.c_str(), "false") == 0)
-        {
-                GPU = false;
-        }
-        else {
-            System::FatalError("Invalid GPU Parameter for DeepQ");
-        }
-        DeepQParameters params;
-        params.setGPU(GPU);
 
-        PlayerPtr DeepQPlayer(new Player_DeepQ(playerID, params));
-        players[playerID].push_back(DeepQPlayer);
+        players[playerID].push_back(PlayerPtr(new Player_DeepQ(playerID)));
     }
     else if (playerModelID == PlayerModels::PortfolioGreedySearch)
     {

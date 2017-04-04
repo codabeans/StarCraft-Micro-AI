@@ -8,10 +8,9 @@ using namespace SparCraft;
 using namespace std;
 
 //constructor, sets important private member variables
-Player_DeepQ::Player_DeepQ(const IDType & playerID, const DeepQParameters & params)
+Player_DeepQ::Player_DeepQ(const IDType & playerID)
 {
     _playerID = playerID;
-    _params = params;
 
     // Verify that the version of the library that we linked against is
     // compatible with the version of the headers we compiled against.

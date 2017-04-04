@@ -2,7 +2,6 @@
 
 #include "Common.h"
 #include "Player.h"
-#include "DeepQParameters.hpp"
 
 namespace SparCraft
 {
@@ -25,10 +24,8 @@ namespace SparCraft
   class Player_DeepQ : public Player
   {
   public:
-    Player_DeepQ (const IDType & playerID, const DeepQParameters & params);
+    Player_DeepQ (const IDType & playerID);
     IDType getType() { return PlayerModels::DeepQ; }
     void getMoves(GameState & state, const MoveArray & moves, std::vector<Action> & moveVec);
-private:
-    DeepQParameters _params;
   };
 }
