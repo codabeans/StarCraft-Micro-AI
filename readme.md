@@ -1,10 +1,8 @@
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
-# DeepQraft
+# StarCraft Micro AI
 
-This project is a clone of Dave Churchill's Sparcraft with the addition of one extra bot, DeepQ. 
-As the name suggests, this bot utilizes deep q learning to learn how to play. I am in the process
-of training one scenario, and once it is done, then I will upload the .caffemodel for all to enjoy.
-Down the line, I would like to have one model capable of doing matches X units vs Y units for any 
-unit type. 
+This project is a clone of Dave Churchill's Sparcraft with the addition of one extra bot, DeepQ. WHen I started this project, I simply wanted to see if generic Deep Q learning would suffice in learning how to play SparCraft. As I expected, it did not. It failed to converge on any level. 
+
+Moving forward, this bot will utilize policy gradients and hopefully have better success. 
 
 [Installation instructions](https://github.com/TuringsEgo/deepcraft/blob/master/INSTALL.md)
