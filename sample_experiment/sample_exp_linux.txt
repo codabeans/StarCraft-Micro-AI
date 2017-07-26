@@ -145,7 +145,7 @@ ResultsFile sample_exp False
 #
 #  Format
 #  Display BOOL ImageDir
-#
+
 #  This directory is included with SparCraft in folder SparCraft\starcraft_images\
 #  Be sure to use forward slash "\" and include the final "\" character
 #  No spaces allowed!

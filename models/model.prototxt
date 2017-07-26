@@ -1,10 +1,4 @@
 layer {
-  name: "frame"
-  type: "Input"
-  top: "frame"
-  input_param { shape: { dim: 1 dim: 3 dim: 162 dim: 120 } }
-}
-layer {
   name: "actions"
   type: "Input"
   top: "actions"

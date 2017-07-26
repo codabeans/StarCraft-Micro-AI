@@ -53,8 +53,9 @@ export LD	:=		$(CXX)
 INCLUDEPATH 		= 		-I$(BWAPI)/bwapi \
 					-I$(BWAPI)/bwapi/include \
 					-I$(BWAPI)/bwapi/include/BWAPI \
+					-I$(CAFFE)/include \
+					-I/opt/cuda/include \
 					-I/usr/include/SDL2 \
-					-I/usr/local/cuda/include \
 					-I/usr/local/include
 					
 
@@ -62,7 +63,9 @@ SDL_LDFLAGS	=		`sdl2-config --libs`
 SDL_CFLAGS	=		`sdl2-config --cflags`
 CXXFLAGS		=		-w -Wall -g -std=c++11 $(SDL_CFLAGS)
 
-LIBS		= 			-lGL -lm -lGLU -lSDL2 -lSDL2_image -lstdc++ $(SDL_LDFLAGS)
+LIBS		= 			-lGL -lm -lGLU -lSDL2 -lSDL2_image \
+					-lstdc++ -L$(CAFFE)/build/lib -lboost_system \
+					-lglog -lboost_filesystem -lcaffe $(SDL_LDFLAGS)
 
 LDFLAGS		=		$(LIBS)
 

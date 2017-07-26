@@ -897,7 +897,7 @@ void SearchExperiment::runExperiment()
 				Game g(states[state], playerOne, playerTwo, 20000);
                 ScoreType gameEval = 0;
 
-                if (showDisplay)
+                if (false)//(showDisplay)
                 {
 					static GUI gui(1280, 720);
                     gui.setGame(g);
