@@ -905,7 +905,6 @@ void SearchExperiment::runExperiment()
                     while (!gui.getGame().gameOver())
                     {
                         gui.onFrame();
-                        gui.saveScreenshotBMP("frame.bmp");
                     }
 
                     gameEval = gui.getGame().getState().eval(Players::Player_One, SparCraft::EvaluationMethods::LTD2).val();

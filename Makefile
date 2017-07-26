@@ -1,11 +1,12 @@
-PROJECT := caffe
+PROJECT := 	Micro-AI
 
-BWAPI		=		/home/faust/Documents/StarCraft/bwapi
+BWAPI		=		/home/faust/Documents/StarCraft-AI/bwapi
 
 SOURCE		:= 		source
 BUILD		:=		build
 BWAPI_BUILD	:=		$(BWAPI)/bwapi/build/
 INCLUDE		:= 		include
+CAFFE		:=		/home/faust/Documents/caffe
 
 #Target name
 TARGET		:=		bin/StarCraft-Micro-AI
@@ -18,7 +19,6 @@ OBJS 		:= 		$(addprefix $(BUILD)/, ${SRCS:$(SOURCE)/%.cpp=%.o})
 
 BWAPI_SRCS 	:= 		$(shell find $(BWAPI)/bwapi/BWAPILIB/ -name "*.cpp" -printf '%P\n')
 BWAPI_OBJS 	:= 		$(addprefix $(BWAPI)/bwapi/build/, ${BWAPI_SRCS:%.cpp=%.o})
-
 BWAPISRCS 	:=		$(addprefix $(BWAPI)/bwapi/BWAPILIB/, ${BWAPI_SRCS})
 
 #---------------------------------------------------------------------------------
@@ -49,56 +49,44 @@ export LD	:=		$(CXX)
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------
-export INCLUDE		=		$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
-							-I$(CURDIR)/$(BUILD)
-
 # Linking flags
 INCLUDEPATH 		= 		-I$(BWAPI)/bwapi \
 					-I$(BWAPI)/bwapi/include \
 					-I$(BWAPI)/bwapi/include/BWAPI \
-					-I$(CAFFE)/include \
+					-I/usr/include/SDL2 \
 					-I/usr/local/cuda/include \
-					-I/usr/local/include \
-					-I/usr/local/lib
+					-I/usr/local/include
+					
 
 SDL_LDFLAGS	=		`sdl2-config --libs`
 SDL_CFLAGS	=		`sdl2-config --cflags`
-CXXFLAGS		=		-O3 -w -Wall -std=c++11 $(SDL_CFLAGS)
+CXXFLAGS		=		-w -Wall -g -std=c++11 $(SDL_CFLAGS)
 
-LIBS		= -lGL -lGLU -lSDL2_image \
-					-lopencv_core -lopencv_highgui \
-					-lopencv_imgproc  -lopencv_imgcodecs \
-					-lboost_system -lglog \
-					-L$(CAFFE)/build/lib -lboost_filesystem \
- 					-lprotobuf $(SDL_LDFLAGS)
+LIBS		= 			-lGL -lm -lGLU -lSDL2 -lSDL2_image -lstdc++ $(SDL_LDFLAGS)
 
 LDFLAGS		=		$(LIBS)
 
-all: protoc_middleman build_dirs lib link
-
-protoc_middleman: sparcraft.proto
-	protoc --cpp_out=. --java_out=. --python_out=. sparcraft.proto
-	@touch protoc_middleman
+all: build_dirs lib link
 
 build_dirs: $(ALL_BUILD_DIRS)
 
-lib: $(BWAPI_OBJS) $(OBJS) $(OBJS)
+lib: $(BWAPI_OBJS) $(OBJS)
 
 link:
 	@echo linking ...
 	@mkdir -p bin
-	@$(LD) $(OBJS) $(BWAPI_OBJS) $(LDFLAGS) -o $(TARGET)
+	@$(LD) $(BWAPI_OBJS) $(OBJS) $(LDFLAGS) -o $(TARGET)
 
 $(ALL_BUILD_DIRS):
 	@mkdir -p $@
 
 $(BUILD)/%.o:$(SOURCE)/%.cpp
 	@ echo CXX $^
-	@$(CXX) $(INCLUDEPATH) $(CXXFLAGS) -c $^ -o $@ $(INCLUDE)
+	@$(CXX) $(INCLUDEPATH) $(CXXFLAGS) -c $^ -o $@
 
 $(BWAPI_BUILD)%.o:$(BWAPI)/bwapi/BWAPILIB/%.cpp
 	@ echo CXX BWAPI/$*
-	@$(CXX) $(INCLUDEPATH) $(CXXFLAGS) -c $^ -o $@ $(INCLUDE)
+	@$(CXX) $(INCLUDEPATH) $(CXXFLAGS) -c $^ -o $@
 
 # Cleanup
 clean:

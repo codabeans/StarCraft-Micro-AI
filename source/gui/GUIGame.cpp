@@ -47,9 +47,9 @@ void GUIGame::onFrame()
         }
     }
 
-    drawParameters(5, 15);
-    drawSearchResults(5, 150);
-    drawInfo();
+    //drawParameters(5, 15);
+    //drawSearchResults(5, 150);
+    //drawInfo();
 }
 
 void GUIGame::drawInfo()

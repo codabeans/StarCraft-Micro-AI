@@ -392,7 +392,6 @@ std::string GUI::GetTextureFileName(const BWAPI::UnitType & type)
 			filename[i] = '_';
 		}
 	}
-
 	return filename;
 }
 

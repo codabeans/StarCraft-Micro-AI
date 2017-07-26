@@ -71,8 +71,8 @@ Player 0 PortfolioGreedySearch 0 NOKDPS 1 0
 
 # Sample Scripted Players
 #Player 0 NOKDPS
-#Player 1 NOKDPS
-Player 1 DeepQ true
+Player 1 NOKDPS
+#Player 1 DeepQ true
 ####################################################
 #
 # Set player upgrade and tech levels
@@ -125,7 +125,7 @@ State SeparatedState 2500 128 128 400 360 840 360 Protoss_Dragoon 10
 #
 ##################################################
 
-ResultsFile sample_exp true
+ResultsFile sample_exp False
 
 ##################################################
 #
@@ -152,4 +152,4 @@ ResultsFile sample_exp true
 #
 ##################################################
 
-Display true PATH_TO\starcraft_images\
+Display true /home/faust/Documents/StarCraft-AI/StarCraft-Micro-AI/starcraft_images
